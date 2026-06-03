@@ -6,7 +6,6 @@
 <div th:fragment="content">
     <h1 class="mb-4">📚 Mượn sách</h1>
 
-    <!-- Thông báo -->
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <div class="row">
@@ -23,10 +22,15 @@
                         <p><strong>Số lượng có sẵn:</strong> <span th:text="${book.quantity}">0</span></p>
                     </div>
 
+                    <!-- Ngày mượn và hạn trả dự kiến -->
+                    <div class="alert alert-info">
+                        <p><strong>Ngày mượn:</strong> <span th:text="${#temporals.format(borrowDate, 'dd/MM/yyyy')}"></span></p>
+                        <p><strong>Hạn trả dự kiến:</strong> <span th:text="${#temporals.format(dueDate, 'dd/MM/yyyy')}"></span> (14 ngày)</p>
+                    </div>
+
                     <form th:action="@{/borrow}" method="post">
                         <input type="hidden" name="bookId" th:value="${book.id}">
 
-                        <!-- Nếu là Thủ thư: cho phép chọn độc giả -->
                         <div class="mb-3" sec:authorize="hasRole('LIBRARIAN')">
                             <label for="userId" class="form-label">Chọn độc giả</label>
                             <select name="userId" id="userId" class="form-select" required>
@@ -35,9 +39,6 @@
                                         th:text="${user.fullName} + ' (' + ${user.username} + ')'"></option>
                             </select>
                         </div>
-
-                        <!-- Nếu là Độc giả: userId sẽ được controller tự động lấy từ current user, không cần input -->
-                        <!-- (Người dùng thường không thấy trường này) -->
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">✅ Xác nhận mượn</button>
@@ -48,7 +49,6 @@
             </div>
         </div>
 
-        <!-- Cột phụ: ảnh bìa -->
         <div class="col-md-4">
             <img th:if="${book.imageFilename}"
                  th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"

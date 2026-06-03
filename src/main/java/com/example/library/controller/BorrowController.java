@@ -3,6 +3,7 @@ package com.example.library.controller;
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.RoleConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.model.Book;
 import com.example.library.model.BorrowRecord;
 import com.example.library.model.BorrowStatus;
 import com.example.library.model.User;
@@ -44,14 +45,18 @@ public class BorrowController {
     @GetMapping(ApplicationConstants.BORROW_URL)
     public String borrowForm(@RequestParam("bookId") int bookId, Model model,
                              RedirectAttributes redirectAttributes) {
-        var book = bookService.findById(bookId);
+        Book book = bookService.findById(bookId);
         if (book == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy sách!");
             return "redirect:" + ApplicationConstants.BOOK_LIST_URL;
         }
         model.addAttribute("book", book);
 
-        if (currentUserService.hasRole("ROLE_LIBRARIAN")) {
+        LocalDate today = LocalDate.now();
+        model.addAttribute("borrowDate", today);
+        model.addAttribute("dueDate", today.plusDays(ApplicationConstants.BORROW_DURATION_DAYS));
+
+        if (currentUserService.hasRole(RoleConstants.LIBRARIAN)) {
             model.addAttribute("users", userService.findAll());
         }
         return ScreenConstants.BORROW_FORM;
