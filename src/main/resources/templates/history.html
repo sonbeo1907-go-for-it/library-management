@@ -68,7 +68,7 @@
                             </span>
 
                         <!-- Nút Đánh giá (người mượn, sách đã trả và chưa đánh giá) -->
-                        <span th:if="${record.status.name() == 'RETURNED' and record.user.id == #authentication.principal.id and !reviewStatusMap[record.book.id]}">
+                        <span th:if="${record.status.name() == 'RETURNED' and record.user.id == currentUserId}">
                                 <a th:href="@{/review(bookId=${record.book.id})}" class="btn btn-sm btn-outline-warning">⭐ Đánh giá</a>
                             </span>
                     </div>
