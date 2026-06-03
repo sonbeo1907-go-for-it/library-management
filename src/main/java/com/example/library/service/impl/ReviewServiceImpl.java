@@ -1,5 +1,6 @@
 package com.example.library.service.impl;
 
+import com.example.library.dto.ReviewDto;
 import com.example.library.model.Review;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.ReviewRepository;
@@ -64,5 +65,24 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public long getReviewCount(int bookId) {
         return reviewRepository.countByBookId(bookId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getReviewDtosByBook(int bookId) {
+        List<Review> reviews = reviewRepository.findByBookIdOrderByCreatedAtDesc(bookId);
+        return reviews.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    private ReviewDto convertToDto(Review review) {
+        ReviewDto dto = new ReviewDto();
+        dto.setId(review.getId());
+        dto.setRating(review.getRating());
+        dto.setComment(review.getComment());
+        dto.setCreatedAt(review.getCreatedAt());
+        dto.setReviewerName(review.getUser().getFullName());
+        return dto;
     }
 }
