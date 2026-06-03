@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Controller
@@ -100,13 +102,20 @@ public class BorrowController {
             fine = BigDecimal.valueOf(daysLate * ApplicationConstants.FINE_PER_DAY);
         }
 
+        // Định dạng chuỗi hiển thị phí
+        String formattedFine = "";
+        if (fine.compareTo(BigDecimal.ZERO) > 0) {
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+            formattedFine = numberFormat.format(fine) + " VNĐ";
+        }
+
         model.addAttribute("record", record);
         model.addAttribute("today", today);
         model.addAttribute("daysLate", daysLate);
         model.addAttribute("fine", fine);
+        model.addAttribute("formattedFine", formattedFine);
         return ScreenConstants.RETURN_CONFIRM;
     }
-
     @PostMapping(ApplicationConstants.RETURN_URL)
     public String returnBook(@PathVariable int id, RedirectAttributes redirectAttributes) {
         try {
