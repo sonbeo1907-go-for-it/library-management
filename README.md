@@ -112,13 +112,13 @@ src/main/resources
 ```
 
 ### Ghi chú
-Mật khẩu được mã hoá bằng BCrypt.
-Ảnh sách được lưu trong thư mục uploads/ (tự động tạo).
-Hệ thống sử dụng session-based authentication, không dùng JWT.
-Có thể tìm thấy các hằng số quan trọng trong package constant.
+- Mật khẩu được mã hoá bằng BCrypt.
+- Ảnh sách được lưu trong thư mục uploads/ (tự động tạo).
+- Hệ thống sử dụng session-based authentication, không dùng JWT.
+- Có thể tìm thấy các hằng số quan trọng trong package constant.
 
 ### Đóng góp
-Bài tập cá nhân / nhóm trong môn học. Không nhận pull request bên ngoài.
+Bài tập cá nhân trong môn học. Không nhận pull request bên ngoài.
 
 ### License
 Dự án chỉ dành cho mục đích học tập.
