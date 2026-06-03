@@ -35,14 +35,12 @@
                     </div>
 
                     <!-- Quá hạn & Phí -->
-                    <div class="mb-3">
-                        <div th:if="${daysLate > 0}">
-                            <p class="text-danger"><strong>Số ngày quá hạn:</strong> <span th:text="${daysLate}">0</span> ngày</p>
-                            <p class="text-danger"><strong>Phí phạt:</strong> <span th:text="${#numbers.formatDecimal(fine, 0, 'COMMA')} + ' VNĐ'"></span></p>
-                        </div>
-                        <div th:unless="${daysLate > 0}">
-                            <p class="text-success"><strong>Không có phí quá hạn.</strong></p>
-                        </div>
+                    <div th:if="${daysLate > 0}">
+                        <p class="text-danger"><strong>Số ngày quá hạn:</strong> <span th:text="${daysLate}">0</span> ngày</p>
+                        <p class="text-danger"><strong>Phí phạt:</strong> <span th:text="${formattedFine}">0 VNĐ</span></p>
+                    </div>
+                    <div th:unless="${daysLate > 0}">
+                        <p class="text-success"><strong>Không có phí quá hạn.</strong></p>
                     </div>
 
                     <!-- Form xác nhận trả (POST) -->
