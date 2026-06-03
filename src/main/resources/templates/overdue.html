@@ -6,7 +6,6 @@
 <div th:fragment="content">
     <h1 class="mb-4">⚠️ Sách quá hạn chưa trả</h1>
 
-    <!-- Thông báo -->
     <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
 
@@ -19,37 +18,29 @@
                 <th>Ngày mượn</th>
                 <th>Hạn trả</th>
                 <th>Số ngày quá hạn</th>
+                <th>Phí phạt</th>
                 <th>Hành động</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="record : ${records}">
-                <!-- Tên sách -->
                 <td>
-                    <a th:href="@{/books/{id}(id=${record.book.id})}" th:text="${record.book.title}">Tên sách</a>
+                    <a th:href="@{/books/{id}(id=${record.bookId})}" th:text="${record.bookTitle}">Tên sách</a>
                 </td>
-
-                <!-- Người mượn -->
-                <td th:text="${record.user.fullName}">Người mượn</td>
-
-                <!-- Ngày mượn -->
-                <td th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}">01/01/2024</td>
-
-                <!-- Hạn trả -->
-                <td th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}">15/01/2024</td>
-
-                <!-- Số ngày quá hạn (tính từ dueDate đến hôm nay) -->
+                <td th:text="${record.borrowerName}">Người mượn</td>
+                <td th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}"></td>
                 <td>
-                    <span th:text="${#temporals.daysBetween(record.dueDate, #temporals.createToday())}">0</span> ngày
+                    <span th:text="${record.daysLate}">0</span> ngày
                 </td>
-
-                <!-- Hành động -->
+                <td>
+                    <span th:if="${!record.formattedFineAmount.isEmpty()}" th:text="${record.formattedFineAmount}"></span>
+                    <span th:unless="${!record.formattedFineAmount.isEmpty()}" class="text-muted">—</span>
+                </td>
                 <td>
                     <a th:href="@{/return/{id}(id=${record.id})}" class="btn btn-sm btn-success">↩️ Trả sách</a>
                 </td>
             </tr>
-
-            <!-- Dòng trống nếu không có bản ghi -->
             <tr th:if="${#lists.isEmpty(records)}">
                 <td colspan="6" class="text-center text-muted">Không có sách quá hạn nào.</td>
             </tr>

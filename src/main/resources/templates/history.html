@@ -15,7 +15,6 @@
             <thead>
             <tr>
                 <th>Tên sách</th>
-                <!-- Cột Người mượn chỉ hiển thị cho Librarian -->
                 <th sec:authorize="hasRole('LIBRARIAN')">Người mượn</th>
                 <th>Ngày mượn</th>
                 <th>Hạn trả</th>
@@ -27,13 +26,13 @@
             </thead>
             <tbody>
             <tr th:each="record : ${records}">
-                <!-- Tên sách (liên kết đến chi tiết sách) -->
+                <!-- Tên sách (dùng DTO) -->
                 <td>
-                    <a th:href="@{/books/{id}(id=${record.book.id})}" th:text="${record.book.title}">Tên sách</a>
+                    <a th:href="@{/books/{id}(id=${record.bookId})}" th:text="${record.bookTitle}">Tên sách</a>
                 </td>
 
                 <!-- Người mượn (chỉ Librarian) -->
-                <td sec:authorize="hasRole('LIBRARIAN')" th:text="${record.user.fullName}">Người mượn</td>
+                <td sec:authorize="hasRole('LIBRARIAN')" th:text="${record.borrowerName}">Người mượn</td>
 
                 <!-- Ngày mượn -->
                 <td th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}">01/01/2024</td>
@@ -41,35 +40,35 @@
                 <!-- Hạn trả -->
                 <td th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}">15/01/2024</td>
 
-                <!-- Ngày trả (nếu có) -->
+                <!-- Ngày trả -->
                 <td>
                     <span th:if="${record.returnDate}" th:text="${#temporals.format(record.returnDate, 'dd/MM/yyyy')}"></span>
                     <span th:unless="${record.returnDate}" class="text-muted">—</span>
                 </td>
 
-                <!-- Trạng thái với badge -->
+                <!-- Trạng thái (status là String trong DTO) -->
                 <td>
-                    <span th:if="${record.status.name() == 'BORROWED'}" class="badge bg-warning text-dark">Đang mượn</span>
-                    <span th:if="${record.status.name() == 'RETURNED'}" class="badge bg-success">Đã trả</span>
+                    <span th:if="${record.status == 'BORROWED'}" class="badge bg-warning text-dark">Đang mượn</span>
+                    <span th:if="${record.status == 'RETURNED'}" class="badge bg-success">Đã trả</span>
                 </td>
 
                 <!-- Phí phạt -->
                 <td>
-                    <span th:if="${record.fineAmount > 0}" th:text="${#numbers.formatDecimal(record.fineAmount, 0, 'COMMA')} + ' VNĐ'"></span>
-                    <span th:unless="${record.fineAmount > 0}" class="text-muted">—</span>
+                    <span th:if="${!record.formattedFineAmount.isEmpty()}" th:text="${record.formattedFineAmount}"></span>
+                    <span th:unless="${!record.formattedFineAmount.isEmpty()}" class="text-muted">—</span>
                 </td>
 
                 <!-- Hành động -->
                 <td>
                     <div class="d-flex gap-1">
                         <!-- Nút Trả sách (chỉ Librarian, và sách đang mượn) -->
-                        <span sec:authorize="hasRole('LIBRARIAN')" th:if="${record.status.name() == 'BORROWED'}">
+                        <span sec:authorize="hasRole('LIBRARIAN')" th:if="${record.status == 'BORROWED'}">
                                 <a th:href="@{/return/{id}(id=${record.id})}" class="btn btn-sm btn-success">↩️ Trả sách</a>
                             </span>
 
-                        <!-- Nút Đánh giá (người mượn, sách đã trả và chưa đánh giá) -->
-                        <span th:if="${record.status.name() == 'RETURNED' and record.user.id == currentUserId}">
-                                <a th:href="@{/review(bookId=${record.book.id})}" class="btn btn-sm btn-outline-warning">⭐ Đánh giá</a>
+                        <!-- Nút Đánh giá (người mượn, sách đã trả) -->
+                        <span th:if="${record.status == 'RETURNED' and record.borrowerId == currentUserId}">
+                                <a th:href="@{/review(bookId=${record.bookId})}" class="btn btn-sm btn-outline-warning">⭐ Đánh giá</a>
                             </span>
                     </div>
                 </td>

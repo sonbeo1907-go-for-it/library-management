@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.dto.BorrowRecordDto;
 import com.example.library.model.BorrowRecord;
 
 import java.util.List;
@@ -23,4 +24,10 @@ public interface BorrowService {
 
     // Tìm bản ghi theo id
     BorrowRecord findById(int id);
+
+    public List<BorrowRecordDto> getOverdueRecordDtos();
+
+    List<BorrowRecordDto> getHistoryDtosByUser(int userId);
+
+    List<BorrowRecordDto> getAllHistoryDtos();
 }

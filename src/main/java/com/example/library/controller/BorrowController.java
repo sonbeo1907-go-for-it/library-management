@@ -3,6 +3,7 @@ package com.example.library.controller;
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.RoleConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.dto.BorrowRecordDto;
 import com.example.library.model.Book;
 import com.example.library.model.BorrowRecord;
 import com.example.library.model.BorrowStatus;
@@ -129,33 +130,22 @@ public class BorrowController {
             return "redirect:" + ApplicationConstants.LOGIN_URL;
         }
 
-        List<BorrowRecord> records;
+        List<BorrowRecordDto> records;
         if (currentUserService.hasRole(RoleConstants.LIBRARIAN)) {
-            records = borrowService.getAllHistory();
+            records = borrowService.getAllHistoryDtos();
         } else {
-            records = borrowService.getHistoryByUser(currentUser.getId());
-        }
-
-        // Tạo map reviewStatus: bookId -> đã review chưa (chỉ cho người dùng hiện tại)
-        Map<Integer, Boolean> reviewStatusMap = new HashMap<>();
-        for (BorrowRecord record : records) {
-            if (record.getUser().getId() == currentUser.getId()) { // chỉ kiểm tra nếu người mượn là current user
-                boolean hasReviewed = reviewService.hasUserReviewedBook(currentUser.getId(), record.getBook().getId());
-                reviewStatusMap.put(record.getBook().getId(), hasReviewed);
-            }
+            records = borrowService.getHistoryDtosByUser(currentUser.getId());
         }
 
         model.addAttribute("records", records);
-        model.addAttribute("reviewStatusMap", reviewStatusMap);
+        model.addAttribute("currentUserId", currentUser.getId());
         return ScreenConstants.HISTORY;
     }
 
     // Danh sách quá hạn (chỉ thủ thư)
     @GetMapping(ApplicationConstants.OVERDUE_URL)
     public String overdue(Model model) {
-        model.addAttribute("records", borrowService.getOverdueRecords());
+        model.addAttribute("records", borrowService.getOverdueRecordDtos());
         return ScreenConstants.OVERDUE;
     }
-
-
 }
