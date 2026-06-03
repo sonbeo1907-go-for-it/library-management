@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout(pageTitle=${user.id != 0 ? 'Sửa người dùng' : 'Thêm người dùng'})}">
+<body>
+<div th:fragment="content">
+    <h1 th:text="${user.id != 0 ? '✏️ Sửa người dùng' : '➕ Thêm người dùng mới'}"></h1>
+
+    <!-- Thông báo -->
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <form th:action="@{${user.id != 0 ? '/users/' + user.id + '/edit' : '/users/save'}}"
+          method="post" th:object="${user}">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{username}" id="username" class="form-control"
+                           th:readonly="${user.id != 0}" required>
+                    <small th:if="${user.id != 0}" class="text-muted">Không thể thay đổi tên đăng nhập.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        Mật khẩu <span th:unless="${user.id != 0}" class="text-danger">*</span>
+                    </label>
+                    <input type="password" name="password" id="password" class="form-control"
+                           th:required="${user.id == 0}" minlength="6"
+                           placeholder="Ít nhất 6 ký tự">
+                    <small th:if="${user.id != 0}" class="text-muted">Để trống nếu không muốn đổi mật khẩu.</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{fullName}" id="fullName" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                    <select th:field="*{role}" id="role" class="form-select" required>
+                        <option value="">-- Chọn vai trò --</option>
+                        <option value="READER">Độc giả (READER)</option>
+                        <option value="LIBRARIAN">Thủ thư (LIBRARIAN)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <span th:text="${user.id != 0 ? 'Cập nhật' : 'Lưu'}">Lưu</span>
+            </button>
+            <a th:href="@{/users}" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout(pageTitle='Hồ sơ cá nhân')}">
+<body>
+<div th:fragment="content">
+    <h1 class="mb-4">👤 Hồ sơ cá nhân</h1>
+
+    <!-- Thông báo -->
+    <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Thông tin tài khoản</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted">Tên đăng nhập</label>
+                        <p class="form-control-plaintext" th:text="${user.username}">username</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted">Họ tên</label>
+                        <p class="form-control-plaintext" th:text="${user.fullName}">Họ tên</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted">Vai trò</label>
+                        <p class="form-control-plaintext">
+                            <span th:if="${user.role.name() == 'LIBRARIAN'}" class="badge bg-primary">Thủ thư</span>
+                            <span th:if="${user.role.name() == 'READER'}" class="badge bg-secondary">Độc giả</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hành động -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hành động</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/profile/edit}" class="btn btn-outline-primary">✏️ Chỉnh sửa hồ sơ</a>
+                        <a th:href="@{/profile/change-password}" class="btn btn-outline-warning">🔒 Đổi mật khẩu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

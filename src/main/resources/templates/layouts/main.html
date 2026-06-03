@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(pageTitle)">
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Library</title>
+    <!-- Bootstrap CSS (WebJars) -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <!-- Custom CSS (nếu có) -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- Header -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- Nội dung chính -->
+<main class="flex-fill">
+    <div class="container mt-4">
+        <th:block th:insert="~{::content}"></th:block>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Bootstrap JS (WebJars) -->
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<!-- Custom JS (nếu có) -->
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

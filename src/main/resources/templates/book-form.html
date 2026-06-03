@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout(pageTitle=${book.id != 0 ? 'Sửa sách' : 'Thêm sách'})}">
+<body>
+<div th:fragment="content">
+    <h1 th:text="${book.id != 0 ? '✏️ Sửa sách' : '➕ Thêm sách mới'}"></h1>
+
+    <!-- Thông báo lỗi (nếu có) -->
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- Form -->
+    <form th:action="@{${book.id != 0 ? '/books/' + book.id + '/edit' : '/books/save'}}"
+          method="post" enctype="multipart/form-data" th:object="${book}">
+
+        <!-- Hidden field cho id (khi sửa) -->
+        <input type="hidden" th:field="*{id}">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{title}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tác giả</label>
+                    <input type="text" th:field="*{author}" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nhà xuất bản</label>
+                    <input type="text" th:field="*{publisher}" class="form-control">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Năm xuất bản</label>
+                        <input type="number" th:field="*{year}" class="form-control" min="1000" max="2100">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Số lượng</label>
+                        <input type="number" th:field="*{quantity}" class="form-control" min="0" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Ảnh bìa</label>
+                    <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*"
+                           onchange="previewImage(event)">
+                </div>
+                <!-- Preview ảnh -->
+                <div class="text-center">
+                    <img id="imagePreview"
+                         th:if="${book.imageFilename}"
+                         th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
+                         class="img-thumbnail mb-2" style="max-height: 250px;"
+                         alt="Ảnh bìa hiện tại">
+                    <img id="imagePreviewNew" class="img-thumbnail mb-2" style="max-height: 250px; display: none;"
+                         alt="Ảnh mới">
+                    <p class="text-muted small" id="fileLabel">
+                        <span th:if="${book.imageFilename}">(Ảnh hiện tại, chọn file mới để thay đổi)</span>
+                        <span th:unless="${book.imageFilename}">Chưa có ảnh</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <span th:text="${book.id != 0 ? 'Cập nhật' : 'Lưu'}">Lưu</span>
+            </button>
+            <a th:href="@{/books}" class="btn btn-secondary">Hủy</a>
+        </div>
+    </form>
+</div>
+
+<!-- Script preview ảnh -->
+<script th:inline="javascript">
+    function previewImage(event) {
+        var input = event.target;
+        var reader = new FileReader();
+        reader.onload = function() {
+            var imgPreview = document.getElementById('imagePreview');
+            var imgPreviewNew = document.getElementById('imagePreviewNew');
+            var fileLabel = document.getElementById('fileLabel');
+
+            if (imgPreview) {
+                imgPreview.style.display = 'none'; // Ẩn ảnh cũ nếu có
+            }
+            if (imgPreviewNew) {
+                imgPreviewNew.src = reader.result;
+                imgPreviewNew.style.display = 'block';
+            }
+            if (fileLabel) {
+                fileLabel.textContent = 'Ảnh mới đã chọn';
+            }
+        };
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+</body>
+</html>

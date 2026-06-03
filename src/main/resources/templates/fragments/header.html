@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragment Header</title>
+</head>
+<body>
+<!-- Fragment header chính -->
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <!-- Brand -->
+        <a class="navbar-brand" th:href="@{/home}">
+            <i class="bi bi-book"></i> 📚 Thư viện
+        </a>
+
+        <!-- Toggler cho mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu chính -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Sách (mọi người) -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/books}">
+                        <i class="bi bi-collection"></i> Sách
+                    </a>
+                </li>
+                <!-- Lịch sử mượn (mọi người) -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/history}">
+                        <i class="bi bi-clock-history"></i> Lịch sử
+                    </a>
+                </li>
+
+                <!-- Menu chỉ dành cho Thủ thư (LIBRARIAN) -->
+                <li class="nav-item dropdown" sec:authorize="hasRole('LIBRARIAN')">
+                    <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-tools"></i> Quản lý
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
+                        <li><a class="dropdown-item" th:href="@{/dashboard}">Dashboard</a></li>
+                        <li><a class="dropdown-item" th:href="@{/users}">Quản lý người dùng</a></li>
+                        <li><a class="dropdown-item" th:href="@{/overdue}">Sách quá hạn</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Menu bên phải: người dùng hiện tại -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" th:href="@{/profile}">Hồ sơ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/profile/edit}">Chỉnh sửa hồ sơ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/profile/change-password}">Đổi mật khẩu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item">
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">🔒 Đăng xuất</button>
+                                </form>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

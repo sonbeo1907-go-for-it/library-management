@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main.html :: layout(pageTitle='Trang chủ')}">
+<body>
+<div th:fragment="content">
+    <!-- Lời chào -->
+    <div class="mb-4">
+        <h1 class="display-5">👋 Xin chào, <span sec:authentication="name">Bạn</span>!</h1>
+        <p>
+            <span sec:authorize="hasRole('LIBRARIAN')">Thủ thư</span>
+            <span sec:authorize="hasRole('READER')">Độc giả</span>
+        </p>
+    </div>
+
+    <!-- Dashboard cho Thủ thư -->
+    <div sec:authorize="hasRole('LIBRARIAN')">
+        <h3 class="mb-3">📊 Tổng quan hệ thống</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">📚 Tổng số sách</h5>
+                        <p class="card-text display-6" th:text="${totalBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">✅ Sách có sẵn</h5>
+                        <p class="card-text display-6" th:text="${availableBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">📖 Đang mượn</h5>
+                        <p class="card-text display-6" th:text="${borrowedBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">⏰ Quá hạn</h5>
+                        <p class="card-text display-6" th:text="${overdueBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">👥 Độc giả</h5>
+                        <p class="card-text display-6" th:text="${totalUsers}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hành động nhanh -->
+        <hr class="my-4">
+        <h4>⚡ Hành động nhanh</h4>
+        <div class="d-flex flex-wrap gap-2">
+            <a th:href="@{/books}" class="btn btn-outline-primary btn-lg">📚 Quản lý sách</a>
+            <a th:href="@{/users}" class="btn btn-outline-secondary btn-lg">👥 Quản lý người dùng</a>
+            <a th:href="@{/overdue}" class="btn btn-outline-danger btn-lg">⚠️ Sách quá hạn</a>
+            <a th:href="@{/history}" class="btn btn-outline-dark btn-lg">📋 Lịch sử mượn/trả</a>
+        </div>
+    </div>
+
+    <!-- Dashboard cho Độc giả -->
+    <div sec:authorize="!hasRole('LIBRARIAN')">
+        <h3 class="mb-3">📌 Hoạt động của bạn</h3>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">📗 Sách đang mượn</h5>
+                        <p class="card-text display-6" th:text="${currentlyBorrowed}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">⏳ Sách quá hạn</h5>
+                        <p class="card-text display-6" th:text="${overdue}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+        <h4>🔍 Khám phá</h4>
+        <div class="d-flex flex-wrap gap-2">
+            <a th:href="@{/books}" class="btn btn-primary btn-lg">📚 Xem tất cả sách</a>
+            <a th:href="@{/history}" class="btn btn-outline-dark btn-lg">📋 Lịch sử mượn của tôi</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

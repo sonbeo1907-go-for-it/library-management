@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'Đăng ký'">Đăng ký</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .register-wrapper {
+            display: flex;
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+        .register-form {
+            flex: 1;
+            padding: 3rem 2rem;
+        }
+        .register-image {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1350&q=80') center/cover;
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .register-image {
+                display: block;
+            }
+        }
+        .form-control:focus {
+            border-color: #38f9d7;
+            box-shadow: 0 0 0 0.2rem rgba(56, 249, 215, 0.25);
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border: none;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+        .btn-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+            color: white;
+        }
+        .login-link a {
+            color: #2e8b57;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-wrapper">
+    <!-- Cột form -->
+    <div class="register-form">
+        <h2 class="fw-bold text-center mb-3">📝 Đăng ký tài khoản</h2>
+        <p class="text-muted text-center">Trở thành độc giả của thư viện</p>
+
+        <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
+
+        <form th:action="@{/register}" method="post" th:object="${user}">
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Họ tên</label>
+                <input type="text" th:field="*{fullName}" id="fullName" class="form-control" placeholder="Nguyễn Văn A" required>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Tên đăng nhập</label>
+                <input type="text" th:field="*{username}" id="username" class="form-control" placeholder="ten_dang_nhap" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="Ít nhất 6 ký tự" required minlength="6">
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-register btn-lg">Đăng ký</button>
+            </div>
+        </form>
+
+        <div class="login-link text-center mt-3">
+            <span>Đã có tài khoản?</span>
+            <a th:href="@{/login}">Đăng nhập</a>
+        </div>
+    </div>
+
+    <!-- Cột ảnh minh họa -->
+    <div class="register-image"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<!-- Custom JS -->
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

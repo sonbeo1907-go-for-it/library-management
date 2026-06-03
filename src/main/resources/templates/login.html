@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'Đăng nhập'">Đăng nhập</title>
+    <!-- Bootstrap CSS (WebJars) -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-wrapper {
+            display: flex;
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+        .login-form {
+            flex: 1;
+            padding: 3rem 2rem;
+        }
+        .login-image {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1350&q=80') center/cover;
+            display: none; /* Ẩn trên mobile */
+        }
+        @media (min-width: 768px) {
+            .login-image {
+                display: block;
+            }
+        }
+        .form-control:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 0.2rem rgba(118, 75, 162, 0.25);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+            color: white;
+        }
+        .register-link a {
+            color: #764ba2;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="login-wrapper">
+    <!-- Cột form -->
+    <div class="login-form">
+        <h2 class="fw-bold text-center mb-3">📚 Thư viện</h2>
+        <p class="text-muted text-center">Đăng nhập để tiếp tục</p>
+
+        <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+        <div th:if="${logoutMessage}" class="alert alert-info auto-hide" th:text="${logoutMessage}"></div>
+        <div th:if="${param.registered}" class="alert alert-success auto-hide">Đăng ký thành công! Mời đăng nhập.</div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Tên đăng nhập</label>
+                <input type="text" name="username" id="username" class="form-control" placeholder="Nhập tên đăng nhập" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Nhập mật khẩu" required>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-login btn-lg">Đăng nhập</button>
+            </div>
+        </form>
+
+        <div class="register-link text-center mt-3">
+            <span>Chưa có tài khoản?</span>
+            <a th:href="@{/register}">Đăng ký ngay</a>
+        </div>
+    </div>
+
+    <!-- Cột ảnh minh họa -->
+    <div class="login-image"></div>
+</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<!-- Custom JS -->
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
