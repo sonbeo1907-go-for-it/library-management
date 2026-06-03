@@ -69,7 +69,7 @@ mvn clean spring-boot:run
 
 ### Tài khoản mặc định (tự động tạo nếu chưa tồn tại)
 ```
-Thủ thư: thuthu / 123456
+Thủ thư: admin/ adminpassword
 ```
 
 ### Cấu trúc dự án
@@ -86,6 +86,29 @@ src/main/resources
 ├── static/          # CSS, JS, hình ảnh tĩnh
 ├── templates/       # Thymeleaf views (layouts, fragments, pages)
 └── application.properties
+```
+
+### Sơ đồ luông màn hình
+```
+[Login] <--> [Register]
+   |
+   v
+[Home] --(menu)--> [Book List] --(click)--> [Book Detail]
+   |                    |                      |
+   |                    |                      +-->(Mượn)--> [Borrow Form] --> [History]
+   |                    |                      +-->(Đánh giá)--> [Review Form]
+   |                    +-->(Thêm/Sửa)--> [Book Form]
+   |                    +-->(Xóa) --> redirect Book List
+   |
+   +-->(Lịch sử)--> [History] --(Trả)--> [Return Confirm] --> [History]
+   |
+   +-->(Dashboard)--> [Dashboard] (LIBRARIAN)
+   |
+   +-->(Quản lý User)--> [User List] --(Thêm/Sửa)--> [User Form]
+   |
+   +-->(Profile)--> [Profile] --(Sửa)--> [Profile Edit]
+                  |            +-->(Đổi mật khẩu)--> [Change Password]
+                  +-->(Logout)--> [Login]
 ```
 
 ### Ghi chú
