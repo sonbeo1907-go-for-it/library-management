@@ -15,11 +15,13 @@ public class BorrowRecordDto {
     private LocalDate returnDate;
     private String status;       // "BORROWED" hoặc "RETURNED"
     private BigDecimal fineAmount;
+    private int daysLate;
+    private String formattedFineAmount;
 
     public BorrowRecordDto() {}
 
     public BorrowRecordDto(int id, String bookTitle, int bookId, String borrowerName, int borrowerId,
-                           LocalDate borrowDate, LocalDate dueDate, LocalDate returnDate, String status, BigDecimal fineAmount) {
+                           LocalDate borrowDate, LocalDate dueDate, LocalDate returnDate, String status, BigDecimal fineAmount, int daysLate, String formattedFineAmount) {
         this.id = id;
         this.bookTitle = bookTitle;
         this.bookId = bookId;
@@ -30,9 +32,13 @@ public class BorrowRecordDto {
         this.returnDate = returnDate;
         this.status = status;
         this.fineAmount = fineAmount;
+        this.daysLate = daysLate;
+        this.formattedFineAmount = formattedFineAmount;
     }
 
     // Getters and setters
+    public String getFormattedFineAmount() { return formattedFineAmount; }
+    public void setFormattedFineAmount(String formattedFineAmount) { this.formattedFineAmount = formattedFineAmount; }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getBookTitle() { return bookTitle; }
@@ -53,4 +59,6 @@ public class BorrowRecordDto {
     public void setStatus(String status) { this.status = status; }
     public BigDecimal getFineAmount() { return fineAmount; }
     public void setFineAmount(BigDecimal fineAmount) { this.fineAmount = fineAmount; }
+    public int getDaysLate() { return daysLate; }
+    public void setDaysLate(int daysLate) { this.daysLate = daysLate; }
 }

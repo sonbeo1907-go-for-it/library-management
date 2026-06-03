@@ -1,6 +1,7 @@
 package com.example.library.service.impl;
 
 import com.example.library.constant.ApplicationConstants;
+import com.example.library.dto.BorrowRecordDto;
 import com.example.library.model.Book;
 import com.example.library.model.BorrowRecord;
 import com.example.library.model.BorrowStatus;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -104,5 +107,67 @@ public class BorrowServiceImpl implements BorrowService {
     @Transactional(readOnly = true)
     public BorrowRecord findById(int id) {
         return borrowRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BorrowRecordDto> getOverdueRecordDtos() {
+        List<BorrowRecord> records = borrowRepository.findByStatusAndDueDateBefore(BorrowStatus.BORROWED, LocalDate.now());
+        return records.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    private BorrowRecordDto convertToDto(BorrowRecord record) {
+        BorrowRecordDto dto = new BorrowRecordDto();
+        dto.setId(record.getId());
+        dto.setBookTitle(record.getBook().getTitle());
+        dto.setBookId(record.getBook().getId());
+        dto.setBorrowerName(record.getUser().getFullName());
+        dto.setBorrowerId(record.getUser().getId());
+        dto.setBorrowDate(record.getBorrowDate());
+        dto.setDueDate(record.getDueDate());
+        dto.setReturnDate(record.getReturnDate());
+        dto.setStatus(record.getStatus().name());
+
+        // Tính fineAmount và daysLate
+        if (record.getStatus() == BorrowStatus.RETURNED) {
+            dto.setFineAmount(record.getFineAmount());
+        } else if (record.getStatus() == BorrowStatus.BORROWED && record.getDueDate().isBefore(LocalDate.now())) {
+            long daysLate = ChronoUnit.DAYS.between(record.getDueDate(), LocalDate.now());
+            dto.setFineAmount(BigDecimal.valueOf(daysLate * ApplicationConstants.FINE_PER_DAY));
+            dto.setDaysLate((int) daysLate);
+        } else {
+            dto.setFineAmount(BigDecimal.ZERO);
+            dto.setDaysLate(0);
+        }
+
+        if (dto.getFineAmount().compareTo(BigDecimal.ZERO) > 0) {
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+            String formatted = numberFormat.format(dto.getFineAmount()) + " VNĐ";
+            dto.setFormattedFineAmount(formatted);
+        } else {
+            dto.setFormattedFineAmount("");
+        }
+
+        return dto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BorrowRecordDto> getHistoryDtosByUser(int userId) {
+        return borrowRepository.findByUserIdOrderByBorrowDateDesc(userId)
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BorrowRecordDto> getAllHistoryDtos() {
+        return borrowRepository.findAllByOrderByBorrowDateDesc()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 }
