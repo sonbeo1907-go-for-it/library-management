@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.dto.ReviewDto;
 import com.example.library.model.Review;
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface ReviewService {
     double getAverageRating(int bookId);
 
     long getReviewCount(int bookId);
+
+    List<ReviewDto> getReviewDtosByBook(int bookId);
 }

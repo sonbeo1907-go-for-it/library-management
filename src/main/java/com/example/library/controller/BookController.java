@@ -2,6 +2,7 @@ package com.example.library.controller;
 
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.dto.ReviewDto;
 import com.example.library.model.Book;
 import com.example.library.model.Review;
 import com.example.library.model.User;
@@ -114,11 +115,10 @@ public class BookController {
             return "redirect:" + ApplicationConstants.BOOK_LIST_URL;
         }
 
-        // Thông tin sách
         model.addAttribute("book", book);
 
-        // Đánh giá
-        List<Review> reviews = reviewService.getReviewsByBook(id);
+        // Lấy danh sách ReviewDto (đã có reviewerName)
+        List<ReviewDto> reviews = reviewService.getReviewDtosByBook(id);
         double averageRating = reviewService.getAverageRating(id);
         long reviewCount = reviewService.getReviewCount(id);
 
@@ -126,7 +126,7 @@ public class BookController {
         model.addAttribute("averageRating", averageRating);
         model.addAttribute("reviewCount", reviewCount);
 
-        // Kiểm tra người dùng hiện tại có thể đánh giá không (đã từng mượn và trả, chưa review)
+        // Kiểm tra người dùng hiện tại có thể đánh giá không
         User currentUser = currentUserService.getCurrentUser();
         boolean canReview = false;
         if (currentUser != null) {
