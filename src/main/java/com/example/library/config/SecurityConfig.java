@@ -40,7 +40,6 @@ public class SecurityConfig {
                                 ApplicationConstants.USER_EDIT_URL,
                                 ApplicationConstants.USER_SAVE_URL,
                                 ApplicationConstants.USER_DELETE_URL,
-                                ApplicationConstants.DASHBOARD_URL,
                                 ApplicationConstants.OVERDUE_URL
                         ).hasRole(RoleConstants.ROLE_LIBRARIAN)
                         .anyRequest().authenticated()
