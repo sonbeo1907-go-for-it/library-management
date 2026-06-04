@@ -43,7 +43,6 @@ public final class ApplicationConstants {
     // ===== Thời gian mượn mặc định =====
     public static final int BORROW_DURATION_DAYS = 14;
     public static final long FINE_PER_DAY = 2000; // VND
-    public static final String DASHBOARD_URL = "/dashboard";
 
     public static final String PROFILE_URL = "/profile";
     public static final String PROFILE_EDIT_URL = "/profile/edit";

@@ -1,7 +1,7 @@
 package com.example.library.service.impl;
 
-import com.example.library.model.User;
-import com.example.library.repository.UserRepository;
+import com.example.library.model.user.User;
+import com.example.library.repository.user.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
