@@ -107,4 +107,14 @@ public class ValidationServiceImpl implements ValidationService {
             throw new RuntimeException("Bạn đã đánh giá sách này rồi.");
         }
     }
+
+    @Override
+    public void validateCanReviewOrUpdate(int bookId, int userId) {
+        validateBookExists(bookId);
+        validateUserExists(userId);
+        boolean hasReturned = borrowRepository.existsByUserIdAndBookIdAndStatus(userId, bookId, BorrowStatus.RETURNED);
+        if (!hasReturned) {
+            throw new RuntimeException("Bạn chỉ có thể đánh giá sách đã mượn và đã trả.");
+        }
+    }
 }

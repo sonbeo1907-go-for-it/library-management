@@ -2,7 +2,12 @@ package com.example.library.controller.borrow;
 
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.model.borrow.BorrowRecordDto;
+import com.example.library.model.borrow.ReturnConfirmDto;
+import com.example.library.model.user.User;
 import com.example.library.service.borrow.BorrowPageService;
+import com.example.library.service.user.CurrentUserService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +17,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class BorrowController {
 
     private final BorrowPageService borrowPageService;
+    private final CurrentUserService currentUserService;
 
-    public BorrowController(BorrowPageService borrowPageService) {
+    public BorrowController(BorrowPageService borrowPageService, CurrentUserService currentUserService) {
         this.borrowPageService = borrowPageService;
+        this.currentUserService = currentUserService;
     }
 
     @GetMapping(ApplicationConstants.BORROW_URL)
@@ -49,12 +56,8 @@ public class BorrowController {
     @GetMapping(ApplicationConstants.RETURN_URL)
     public String returnConfirm(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            var confirmDto = borrowPageService.prepareReturnConfirm(id);
-            model.addAttribute("record", confirmDto.getRecord());
-            model.addAttribute("today", confirmDto.getToday());
-            model.addAttribute("daysLate", confirmDto.getDaysLate());
-            model.addAttribute("fine", confirmDto.getFine());
-            model.addAttribute("formattedFine", confirmDto.getFormattedFine());
+            ReturnConfirmDto confirmDto = borrowPageService.prepareReturnConfirm(id);
+            model.addAttribute("confirm", confirmDto);
             return ScreenConstants.RETURN_CONFIRM;
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -74,14 +77,26 @@ public class BorrowController {
     }
 
     @GetMapping(ApplicationConstants.HISTORY_URL)
-    public String history(Model model) {
-        model.addAttribute("records", borrowPageService.getHistory());
+    public String history(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "size", defaultValue = "10") int size,
+                          @RequestParam(value = "status", required = false) String status) {
+        User currentUser = currentUserService.getCurrentUser();
+        if (currentUser != null) {
+            model.addAttribute("currentUserId", currentUser.getId());
+        }
+        Page<BorrowRecordDto> historyPage = borrowPageService.getHistory(page, size, status);
+        model.addAttribute("page", historyPage);
+        model.addAttribute("status", status);   // để giữ lại lựa chọn trong dropdown
         return ScreenConstants.HISTORY;
     }
 
     @GetMapping(ApplicationConstants.OVERDUE_URL)
-    public String overdue(Model model) {
-        model.addAttribute("records", borrowPageService.getOverdue());
+    public String overdue(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<BorrowRecordDto> overduePage = borrowPageService.getOverdue(page, size);
+        model.addAttribute("page", overduePage);
         return ScreenConstants.OVERDUE;
     }
 }

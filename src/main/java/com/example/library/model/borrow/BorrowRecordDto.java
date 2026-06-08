@@ -17,6 +17,7 @@ public class BorrowRecordDto {
     private BigDecimal fineAmount;
     private int daysLate;
     private String formattedFineAmount;
+    private String borrowCode;
 
     public BorrowRecordDto() {}
 
@@ -61,4 +62,7 @@ public class BorrowRecordDto {
     public void setFineAmount(BigDecimal fineAmount) { this.fineAmount = fineAmount; }
     public int getDaysLate() { return daysLate; }
     public void setDaysLate(int daysLate) { this.daysLate = daysLate; }
+
+    public String getBorrowCode() { return borrowCode; }
+    public void setBorrowCode(String borrowCode) { this.borrowCode = borrowCode; }
 }

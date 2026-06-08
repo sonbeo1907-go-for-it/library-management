@@ -30,13 +30,22 @@
                 <td th:text="${user.username}">username</td>
                 <td th:text="${user.fullName}">Họ tên</td>
                 <td>
+                    <span th:if="${user.role.name() == 'ADMIN'}" class="badge bg-danger">Quản trị viên</span>
                     <span th:if="${user.role.name() == 'LIBRARIAN'}" class="badge bg-primary">Thủ thư</span>
                     <span th:if="${user.role.name() == 'READER'}" class="badge bg-secondary">Độc giả</span>
                 </td>
                 <td>
                     <div class="d-flex gap-1">
-                        <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-sm btn-warning">✏️ Sửa</a>
-                        <a th:href="@{/users/{id}/delete(id=${user.id})}" class="btn btn-sm btn-danger confirm-delete">🗑️ Xóa</a>
+                        <!-- Chỉ hiển thị nút sửa/xóa nếu KHÔNG phải ADMIN -->
+                        <a th:if="${user.role.name() != 'ADMIN'}"
+                           th:href="@{/users/{id}/edit(id=${user.id})}"
+                           class="btn btn-sm btn-warning">✏️ Sửa</a>
+                        <a th:if="${user.role.name() != 'ADMIN'}"
+                           th:href="@{/users/{id}/delete(id=${user.id})}"
+                           class="btn btn-sm btn-danger confirm-delete">🗑️ Xóa</a>
+
+                        <!-- Hiển thị thông báo nếu là ADMIN -->
+                        <span th:if="${user.role.name() == 'ADMIN'}" class="text-muted small">Không thể chỉnh sửa</span>
                     </div>
                 </td>
             </tr>

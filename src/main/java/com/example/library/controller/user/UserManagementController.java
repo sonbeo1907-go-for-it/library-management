@@ -2,6 +2,7 @@ package com.example.library.controller.user;
 
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.model.user.Role;
 import com.example.library.model.user.User;
 import com.example.library.service.user.UserManagementService;
 import org.springframework.stereotype.Controller;
@@ -44,7 +45,13 @@ public class UserManagementController {
     @GetMapping(ApplicationConstants.USER_EDIT_URL)
     public String editUserForm(@PathVariable int id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            model.addAttribute("user", userManagementService.getUserById(id));
+            User user = userManagementService.getUserById(id);
+            // Chặn sửa admin
+            if (user.getRole() == Role.ADMIN) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Không thể chỉnh sửa tài khoản Quản trị viên.");
+                return "redirect:" + ApplicationConstants.USER_LIST_URL;
+            }
+            model.addAttribute("user", user);
             return ScreenConstants.USER_FORM;
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -56,6 +63,12 @@ public class UserManagementController {
     public String updateUser(@PathVariable int id, @ModelAttribute User user,
                              RedirectAttributes redirectAttributes) {
         try {
+            // Kiểm tra trước khi cập nhật
+            User existingUser = userManagementService.getUserById(id);
+            if (existingUser.getRole() == Role.ADMIN) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Không thể chỉnh sửa tài khoản Quản trị viên.");
+                return "redirect:" + ApplicationConstants.USER_LIST_URL;
+            }
             userManagementService.updateUser(id, user);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật người dùng thành công!");
         } catch (RuntimeException e) {
@@ -67,6 +80,11 @@ public class UserManagementController {
     @GetMapping(ApplicationConstants.USER_DELETE_URL)
     public String deleteUser(@PathVariable int id, RedirectAttributes redirectAttributes) {
         try {
+            User user = userManagementService.getUserById(id);
+            if (user.getRole() == Role.ADMIN) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa tài khoản Quản trị viên.");
+                return "redirect:" + ApplicationConstants.USER_LIST_URL;
+            }
             userManagementService.softDeleteUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "Đã xóa người dùng (soft delete).");
         } catch (RuntimeException e) {

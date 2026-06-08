@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout(pageTitle='Yêu cầu mượn sách')}">
+<body>
+<div th:fragment="content">
+    <h1 class="mb-4">📋 Yêu cầu mượn sách của bạn</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+
+    <div th:if="${page == null || page.content.isEmpty()}" class="alert alert-info">
+        Bạn chưa có yêu cầu mượn sách nào.
+        <a th:href="@{/books}" class="alert-link">Xem danh sách sách</a>
+    </div>
+
+    <div th:each="cart : ${page.content}" class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Mã giỏ:</strong>
+                <span class="badge bg-primary fs-5" th:text="${cart.cartCode}">ABC123</span>
+                <span class="ms-3">
+                    Trạng thái:
+                    <span th:if="${cart.status.name() == 'SUBMITTED'}" class="badge bg-warning text-dark">Chờ duyệt</span>
+                    <span th:if="${cart.status.name() == 'APPROVED'}" class="badge bg-success">Đã duyệt</span>
+                    <span th:if="${cart.status.name() == 'REJECTED'}" class="badge bg-danger">Từ chối</span>
+                </span>
+            </div>
+            <small class="text-muted" th:text="${cart.submittedAt != null ? #temporals.format(cart.submittedAt, 'dd/MM/yyyy HH:mm') : #temporals.format(cart.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Tên sách</th>
+                        <th>Tác giả</th>
+                        <th>Phí mượn</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${cart.items}">
+                        <td th:text="${item.bookTitle}">Tên sách</td>
+                        <td th:text="${item.bookAuthor}">Tác giả</td>
+                        <td th:text="${item.formattedFeePerItem}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-2">
+                <strong>Tổng phí:</strong> <span th:text="${cart.formattedTotalFee}"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHÂN TRANG -->
+    <nav aria-label="Page navigation" th:if="${page.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Nút Previous -->
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/my-carts(page=${page.number - 1}, size=${page.size})}" th:unless="${page.first}">« Trước</a>
+                <span class="page-link" th:if="${page.first}">« Trước</span>
+            </li>
+
+            <!-- Các số trang -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a class="page-link" th:href="@{/my-carts(page=${i}, size=${page.size})}" th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- Nút Next -->
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/my-carts(page=${page.number + 1}, size=${page.size})}" th:unless="${page.last}">Sau »</a>
+                <span class="page-link" th:if="${page.last}">Sau »</span>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

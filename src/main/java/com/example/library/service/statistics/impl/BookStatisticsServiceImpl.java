@@ -1,6 +1,7 @@
 package com.example.library.service.statistics.impl;
 
 import com.example.library.model.borrow.BorrowStatus;
+import com.example.library.model.user.Role;
 import com.example.library.repository.book.BookRepository;
 import com.example.library.repository.borrow.BorrowRepository;
 import com.example.library.repository.user.UserRepository;
@@ -55,5 +56,10 @@ public class BookStatisticsServiceImpl implements BookStatisticsService {
     @Override
     public long countActiveBorrowings() {
         return countBorrowedBooks(); // tương tự, có thể tách riêng logic nếu cần
+    }
+
+    @Override
+    public long countReaders() {
+        return userRepository.countByRoleAndIsDeletedFalse(Role.READER);
     }
 }

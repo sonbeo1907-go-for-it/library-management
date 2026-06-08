@@ -8,9 +8,11 @@ import com.example.library.repository.user.UserRepository;
 import com.example.library.service.review.ReviewService;
 import com.example.library.service.validation.ValidationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -34,18 +36,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public boolean hasUserReviewedBook(int userId, int bookId) {
         return reviewRepository.existsByUserIdAndBookId(userId, bookId);
-    }
-
-    @Override
-    public Review addReview(int bookId, int userId, int rating, String comment) {
-        validationService.validateCanAddReview(bookId, userId);
-
-        Review review = new Review();
-        review.setBook(bookRepository.findById(bookId).orElseThrow());
-        review.setUser(userRepository.findById(userId).orElseThrow());
-        review.setRating(rating);
-        review.setComment(comment);
-        return reviewRepository.save(review);
     }
 
     @Override
@@ -84,5 +74,31 @@ public class ReviewServiceImpl implements ReviewService {
         dto.setCreatedAt(review.getCreatedAt());
         dto.setReviewerName(review.getUser().getFullName());
         return dto;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Review addOrUpdateReview(int bookId, int userId, int rating, String comment) {
+        Optional<Review> existingOpt = reviewRepository.findByUserIdAndBookId(userId, bookId);
+        if (existingOpt.isPresent()) {
+            Review review = existingOpt.get();
+            review.setRating(rating);
+            review.setComment(comment);
+            return reviewRepository.save(review);
+        } else {
+            validationService.validateCanAddReview(bookId, userId);
+            Review review = new Review();
+            review.setBook(bookRepository.findById(bookId).orElseThrow());
+            review.setUser(userRepository.findById(userId).orElseThrow());
+            review.setRating(rating);
+            review.setComment(comment);
+            return reviewRepository.save(review);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Review getReviewByUserAndBook(int userId, int bookId) {
+        return reviewRepository.findByUserIdAndBookId(userId, bookId).orElse(null);
     }
 }

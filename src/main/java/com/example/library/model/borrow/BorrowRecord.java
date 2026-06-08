@@ -38,6 +38,16 @@ public class BorrowRecord {
     @Column(name = "fine_amount", precision = 10, scale = 2)
     private BigDecimal fineAmount = BigDecimal.ZERO;
 
+    @Column(name = "fee", precision = 10, scale = 2)
+    private BigDecimal fee = BigDecimal.ZERO;
+
+    @Column(name = "borrow_code", unique = true, length = 20)
+    private String borrowCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "returned_by")
+    private User returnedBy; // Thủ thư xác nhận trả
+
     // Constructors
     public BorrowRecord() {}
 
@@ -65,4 +75,18 @@ public class BorrowRecord {
     public void setStatus(BorrowStatus status) { this.status = status; }
     public BigDecimal getFineAmount() { return fineAmount; }
     public void setFineAmount(BigDecimal fineAmount) { this.fineAmount = fineAmount; }
+
+    public BigDecimal getFee() { return fee; }
+    public void setFee(BigDecimal fee) { this.fee = fee; }
+
+    public String getBorrowCode() {
+        return borrowCode;
+    }
+
+    public void setBorrowCode(String borrowCode) {
+        this.borrowCode = borrowCode;
+    }
+
+    public User getReturnedBy() { return returnedBy; }
+    public void setReturnedBy(User returnedBy) { this.returnedBy = returnedBy; }
 }

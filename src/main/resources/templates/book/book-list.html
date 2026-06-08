@@ -19,13 +19,13 @@
         <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">🔍 Tìm</button>
         </div>
-        <div class="col-md-2" sec:authorize="hasRole('LIBRARIAN')">
+        <div class="col-md-2" sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')">
             <a th:href="@{/books/new}" class="btn btn-success w-100">➕ Thêm sách</a>
         </div>
     </form>
 
     <!-- Giao diện cho Thủ thư: dạng bảng -->
-    <div sec:authorize="hasRole('LIBRARIAN')">
+    <div sec:authorize="hasAnyRole('LIBRARIAN', 'ADMIN')">
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
                 <thead>
@@ -38,26 +38,30 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="book : ${books}">
+                <tr th:each="book : ${page.content}">
                     <td>
-                        <img th:if="${book.imageFilename}"
+                        <!-- Có tên ảnh -> thử load, lỗi thì fallback sample.png -->
+                        <img th:if="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
                              th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
-                             width="50" class="img-thumbnail">
-                        <span th:unless="${book.imageFilename}" class="text-muted">—</span>
+                             onerror="this.onerror=null; this.src='/uploads/sample.png';"
+                             width="50" class="img-thumbnail" alt="Ảnh bìa">
+                        <!-- Không có tên ảnh -> dùng thẳng sample.png -->
+                        <img th:unless="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
+                             th:src="@{/uploads/sample.png}"
+                             width="50" class="img-thumbnail" alt="Ảnh bìa">
                     </td>
                     <td th:text="${book.title}"></td>
                     <td th:text="${book.author}"></td>
                     <td th:text="${book.quantity}"></td>
                     <td>
                         <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-info">👁️ Chi tiết</a>
-                        <a th:if="${book.quantity > 0}" th:href="@{/borrow(bookId=${book.id})}" class="btn btn-sm btn-primary">📚 Mượn</a>
-                        <span sec:authorize="hasRole('LIBRARIAN')">
-                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-sm btn-warning">✏️ Sửa</a>
-                                <a th:href="@{/books/{id}/delete(id=${book.id})}" class="btn btn-sm btn-danger confirm-delete">🗑️ Xóa</a>
-                            </span>
+                        <span sec:authorize="hasAnyRole('LIBRARIAN', 'ADMIN')">
+                            <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-sm btn-warning">✏️ Sửa</a>
+                            <a th:href="@{/books/{id}/delete(id=${book.id})}" class="btn btn-sm btn-danger confirm-delete">🗑️ Xóa</a>
+                        </span>
                     </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(books)}">
+                <tr th:if="${page.content.isEmpty()}">
                     <td colspan="5" class="text-center text-muted">Không có sách nào.</td>
                 </tr>
                 </tbody>
@@ -66,32 +70,55 @@
     </div>
 
     <!-- Giao diện cho Độc giả: dạng card -->
-    <div sec:authorize="!hasRole('LIBRARIAN')">
+    <div sec:authorize="!hasAnyRole('LIBRARIAN', 'ADMIN')">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col" th:each="book : ${books}">
+            <div class="col" th:each="book : ${page.content}">
                 <div class="card h-100 shadow-sm">
-                    <img th:if="${book.imageFilename}"
+                    <!-- Có tên ảnh -> thử load, lỗi thì fallback sample.png -->
+                    <img th:if="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
                          th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
+                         onerror="this.onerror=null; this.src='/uploads/sample.png';"
                          class="card-img-top" alt="Ảnh bìa" style="height: 250px; object-fit: cover;">
-                    <div th:unless="${book.imageFilename}" class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                        <span class="text-muted">Chưa có ảnh</span>
-                    </div>
+                    <!-- Không có tên ảnh -> dùng thẳng sample.png -->
+                    <img th:unless="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
+                         th:src="@{/uploads/sample.png}"
+                         class="card-img-top" alt="Ảnh bìa" style="height: 250px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${book.title}">Tên sách</h5>
                         <p class="card-text text-muted" th:text="${book.author}">Tác giả</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-outline-secondary btn-sm">Chi tiết</a>
-                            <a th:if="${book.quantity > 0}" th:href="@{/borrow(bookId=${book.id})}" class="btn btn-primary btn-sm">📚 Mượn</a>
+                            <form th:action="@{/cart/add/{bookId}(bookId=${book.id})}" method="post" style="display:inline;">
+                                <button type="submit" th:if="${book.quantity > 0}" class="btn btn-primary btn-sm">🛒 Thêm vào giỏ</button>
+                            </form>
                             <span th:unless="${book.quantity > 0}" class="badge bg-danger">Hết sách</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div th:if="${#lists.isEmpty(books)}" class="col-12 text-center text-muted">
+            <div th:if="${page.content.isEmpty()}" class="col-12 text-center text-muted">
                 Không có sách nào.
             </div>
         </div>
     </div>
+
+    <nav aria-label="Page navigation" th:if="${page.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${page.number - 1}, size=${size}, keyword=${param.keyword})}" th:unless="${page.first}">« Trước</a>
+                <span class="page-link" th:if="${page.first}">« Trước</span>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a class="page-link" th:href="@{/books(page=${i}, size=${size}, keyword=${param.keyword})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${page.number + 1}, size=${size}, keyword=${param.keyword})}" th:unless="${page.last}">Sau »</a>
+                <span class="page-link" th:if="${page.last}">Sau »</span>
+            </li>
+        </ul>
+    </nav>
+
 </div>
 </body>
 </html>

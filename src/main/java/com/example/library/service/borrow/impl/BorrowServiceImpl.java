@@ -5,11 +5,14 @@ import com.example.library.model.borrow.BorrowRecordDto;
 import com.example.library.model.book.Book;
 import com.example.library.model.borrow.BorrowRecord;
 import com.example.library.model.borrow.BorrowStatus;
+import com.example.library.model.user.User;
 import com.example.library.repository.book.BookRepository;
 import com.example.library.repository.borrow.BorrowRepository;
 import com.example.library.repository.user.UserRepository;
 import com.example.library.service.borrow.BorrowService;
 import com.example.library.service.validation.ValidationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -128,6 +132,7 @@ public class BorrowServiceImpl implements BorrowService {
         dto.setBorrowDate(record.getBorrowDate());
         dto.setDueDate(record.getDueDate());
         dto.setReturnDate(record.getReturnDate());
+        dto.setBorrowCode(record.getBorrowCode());
         dto.setStatus(record.getStatus().name());
 
         // Tính fineAmount và daysLate
@@ -155,19 +160,63 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BorrowRecordDto> getHistoryDtosByUser(int userId) {
-        return borrowRepository.findByUserIdOrderByBorrowDateDesc(userId)
-                .stream()
-                .map(this::convertToDto)
-                .toList();
+    public Page<BorrowRecordDto> getHistoryDtosByUser(int userId, String status, Pageable pageable) {
+        if (status != null && !status.isBlank()) {
+            BorrowStatus borrowStatus = BorrowStatus.valueOf(status.toUpperCase());
+            return borrowRepository.findByUserIdAndStatusOrderByBorrowDateDesc(userId, borrowStatus, pageable)
+                    .map(this::convertToDto);
+        } else {
+            return borrowRepository.findByUserIdOrderByBorrowDateDesc(userId, pageable)
+                    .map(this::convertToDto);
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BorrowRecordDto> getAllHistoryDtos() {
-        return borrowRepository.findAllByOrderByBorrowDateDesc()
-                .stream()
-                .map(this::convertToDto)
-                .toList();
+    public Page<BorrowRecordDto> getAllHistoryDtos(String status, Pageable pageable) {
+        if (status != null && !status.isBlank()) {
+            BorrowStatus borrowStatus = BorrowStatus.valueOf(status.toUpperCase());
+            return borrowRepository.findByStatusOrderByBorrowDateDesc(borrowStatus, pageable)
+                    .map(this::convertToDto);
+        } else {
+            return borrowRepository.findAllByOrderByBorrowDateDesc(pageable)
+                    .map(this::convertToDto);
+        }
+    }
+
+    @Override
+    public BorrowRecord createBorrowRecord(Book book, User user, LocalDate borrowDate, LocalDate dueDate, BigDecimal fee) {
+        BorrowRecord record = new BorrowRecord();
+        record.setBook(book);
+        record.setUser(user);
+        record.setBorrowDate(borrowDate);
+        record.setDueDate(dueDate);
+        record.setStatus(BorrowStatus.BORROWED);
+        record.setFee(fee);
+        record.setFineAmount(BigDecimal.ZERO);
+        record.setBorrowCode("BORW-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        return borrowRepository.save(record);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BorrowRecordDto> getHistoryDtosByUser(int userId, Pageable pageable) {
+        return borrowRepository.findByUserIdOrderByBorrowDateDesc(userId, pageable)
+                .map(this::convertToDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BorrowRecordDto> getAllHistoryDtos(Pageable pageable) {
+        return borrowRepository.findAllByOrderByBorrowDateDesc(pageable)
+                .map(this::convertToDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BorrowRecordDto> getOverdueRecordDtos(Pageable pageable) {
+        Page<BorrowRecord> records = borrowRepository.findByStatusAndDueDateBefore(
+                BorrowStatus.BORROWED, LocalDate.now(), pageable);
+        return records.map(this::convertToDto);
     }
 }

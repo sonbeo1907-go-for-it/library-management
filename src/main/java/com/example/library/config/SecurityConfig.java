@@ -31,17 +31,28 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/uploads/**"
                         ).permitAll()
+                        // Các URL quản lý sách & overdue dành cho LIBRARIAN và ADMIN
                         .requestMatchers(
                                 ApplicationConstants.BOOK_NEW_URL,
                                 ApplicationConstants.BOOK_EDIT_URL,
                                 ApplicationConstants.BOOK_DELETE_URL,
+                                ApplicationConstants.OVERDUE_URL
+                        ).hasAnyRole(RoleConstants.ROLE_LIBRARIAN, RoleConstants.ROLE_ADMIN)
+                        // Các URL quản lý user CHỈ DÀNH CHO ADMIN
+                        .requestMatchers(
                                 ApplicationConstants.USER_LIST_URL,
                                 ApplicationConstants.USER_NEW_URL,
                                 ApplicationConstants.USER_EDIT_URL,
                                 ApplicationConstants.USER_SAVE_URL,
-                                ApplicationConstants.USER_DELETE_URL,
-                                ApplicationConstants.OVERDUE_URL
-                        ).hasRole(RoleConstants.ROLE_LIBRARIAN)
+                                ApplicationConstants.USER_DELETE_URL
+                        ).hasRole(RoleConstants.ROLE_ADMIN)
+                        // Các URL duyệt mượn & trả sách dành cho LIBRARIAN và ADMIN
+                        .requestMatchers(
+                                "/approvals/**",
+                                "/return/**"
+                        ).hasAnyRole(RoleConstants.ROLE_LIBRARIAN, RoleConstants.ROLE_ADMIN)
+                        // Các URL dành riêng cho ADMIN (báo cáo, cấu hình, ...)
+                        .requestMatchers("/admin/**").hasRole(RoleConstants.ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
@@ -23,4 +24,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     // Đếm số lượt đánh giá của sách
     long countByBookId(int bookId);
+
+    Optional<Review> findByUserIdAndBookId(int userId, int bookId);
 }

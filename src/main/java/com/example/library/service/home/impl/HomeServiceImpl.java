@@ -26,15 +26,16 @@ public class HomeServiceImpl implements HomeService {
     public HomeDto getHomeData(User currentUser) {
         HomeDto dto = new HomeDto();
         dto.setUser(currentUser);
-        boolean isLibrarian = currentUser.getRole() == Role.LIBRARIAN;
-        dto.setLibrarian(isLibrarian);
+        boolean acceptedRoles = currentUser.getRole() == Role.LIBRARIAN
+                || currentUser.getRole() == Role.ADMIN;
+        dto.setLibrarian(acceptedRoles);
 
-        if (isLibrarian) {
+        if (acceptedRoles) {
             dto.setTotalBooks(statisticsService.countTotalBooks());
             dto.setAvailableBooks(statisticsService.countAvailableBooks());
             dto.setBorrowedBooks(statisticsService.countBorrowedBooks());
             dto.setOverdueBooks(statisticsService.countOverdueBooks());
-            dto.setTotalUsers(statisticsService.countTotalUsers());
+            dto.setTotalUsers(statisticsService.countReaders());
         } else {
             var history = borrowService.getHistoryByUser(currentUser.getId());
             long currentlyBorrowed = history.stream()

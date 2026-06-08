@@ -10,14 +10,31 @@
     <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
 
+    <!-- Form lọc trạng thái (GET) -->
+    <form th:action="@{/history}" method="get" class="row g-3 mb-4">
+        <div class="col-auto">
+            <label for="statusFilter" class="col-form-label">Trạng thái:</label>
+        </div>
+        <div class="col-auto">
+            <select name="status" id="statusFilter" class="form-select" onchange="this.form.submit()">
+                <option value="">Tất cả</option>
+                <option value="BORROWED" th:selected="${status == 'BORROWED'}">Đang mượn</option>
+                <option value="RETURNED" th:selected="${status == 'RETURNED'}">Đã trả</option>
+            </select>
+        </div>
+        <!-- Giữ lại tham số size nếu có (để không mất khi lọc) -->
+        <input type="hidden" name="size" th:value="${page.size}">
+    </form>
+
     <div class="table-responsive">
         <table class="table table-striped table-hover align-middle">
             <thead>
             <tr>
                 <th>Tên sách</th>
-                <th sec:authorize="hasRole('LIBRARIAN')">Người mượn</th>
+                <th sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')">Người mượn</th>
                 <th>Ngày mượn</th>
                 <th>Hạn trả</th>
+                <th>Mã mượn</th>   <!-- thêm cột này -->
                 <th>Ngày trả</th>
                 <th>Trạng thái</th>
                 <th>Phí phạt</th>
@@ -25,64 +42,65 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="record : ${records}">
-                <!-- Tên sách (dùng DTO) -->
+            <tr th:each="record : ${page.content}">
                 <td>
                     <a th:href="@{/books/{id}(id=${record.bookId})}" th:text="${record.bookTitle}">Tên sách</a>
                 </td>
-
-                <!-- Người mượn (chỉ Librarian) -->
-                <td sec:authorize="hasRole('LIBRARIAN')" th:text="${record.borrowerName}">Người mượn</td>
-
-                <!-- Ngày mượn -->
-                <td th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}">01/01/2024</td>
-
-                <!-- Hạn trả -->
-                <td th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}">15/01/2024</td>
-
-                <!-- Ngày trả -->
+                <td sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')" th:text="${record.borrowerName}">Người mượn</td>
+                <td th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <code th:text="${record.borrowCode}">BORW-12345678</code>   <!-- mã mượn -->
+                </td>
                 <td>
                     <span th:if="${record.returnDate}" th:text="${#temporals.format(record.returnDate, 'dd/MM/yyyy')}"></span>
                     <span th:unless="${record.returnDate}" class="text-muted">—</span>
                 </td>
-
-                <!-- Trạng thái (status là String trong DTO) -->
                 <td>
                     <span th:if="${record.status == 'BORROWED'}" class="badge bg-warning text-dark">Đang mượn</span>
                     <span th:if="${record.status == 'RETURNED'}" class="badge bg-success">Đã trả</span>
                 </td>
-
-                <!-- Phí phạt -->
                 <td>
                     <span th:if="${!record.formattedFineAmount.isEmpty()}" th:text="${record.formattedFineAmount}"></span>
                     <span th:unless="${!record.formattedFineAmount.isEmpty()}" class="text-muted">—</span>
                 </td>
-
-                <!-- Hành động -->
                 <td>
                     <div class="d-flex gap-1">
-                        <!-- Nút Trả sách (chỉ Librarian, và sách đang mượn) -->
-                        <span sec:authorize="hasRole('LIBRARIAN')" th:if="${record.status == 'BORROWED'}">
-                                <a th:href="@{/return/{id}(id=${record.id})}" class="btn btn-sm btn-success">↩️ Trả sách</a>
-                            </span>
-
-                        <!-- Nút Đánh giá (người mượn, sách đã trả) -->
+                        <span sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')" th:if="${record.status == 'BORROWED'}">
+                            <a th:href="@{/return/{id}(id=${record.id})}" class="btn btn-sm btn-success">↩️ Trả sách</a>
+                        </span>
                         <span th:if="${record.status == 'RETURNED' and record.borrowerId == currentUserId}">
-                                <a th:href="@{/review(bookId=${record.bookId})}" class="btn btn-sm btn-outline-warning">⭐ Đánh giá</a>
-                            </span>
+                            <a th:href="@{/review(bookId=${record.bookId})}" class="btn btn-sm btn-outline-warning">⭐ Đánh giá</a>
+                        </span>
                     </div>
                 </td>
             </tr>
-
-            <!-- Dòng trống nếu không có bản ghi -->
-            <tr th:if="${#lists.isEmpty(records)}">
-                <td th:attr="colspan=${#authorization.expression('hasRole(''LIBRARIAN'')') ? 8 : 7}" class="text-center text-muted">
+            <tr th:if="${page.content.isEmpty()}">
+                <td th:attr="colspan=${#authorization.expression('hasRole(''LIBRARIAN'')') ? 9 : 8}" class="text-center text-muted">
                     Không có lịch sử mượn/trả nào.
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- PHÂN TRANG (giữ nguyên status và size) -->
+    <nav aria-label="Page navigation" th:if="${page.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/history(page=${page.number - 1}, size=${page.size}, status=${status})}" th:unless="${page.first}">« Trước</a>
+                <span class="page-link" th:if="${page.first}">« Trước</span>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a class="page-link" th:href="@{/history(page=${i}, size=${page.size}, status=${status})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/history(page=${page.number + 1}, size=${page.size}, status=${status})}" th:unless="${page.last}">Sau »</a>
+                <span class="page-link" th:if="${page.last}">Sau »</span>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

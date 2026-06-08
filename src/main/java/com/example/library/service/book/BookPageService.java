@@ -2,6 +2,7 @@ package com.example.library.service.book;
 
 import com.example.library.model.book.Book;
 import com.example.library.model.book.BookDetailDto;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,4 +15,5 @@ public interface BookPageService {
     Book updateBook(int id, Book bookDetails, MultipartFile imageFile) throws IOException;
     void deleteBook(int id);
     Book getBookById(int id);
+    Page<Book> getBooksForList(String keyword, int page, int size);
 }

@@ -9,14 +9,15 @@
 
     <div class="row">
         <div class="col-md-4 text-center mb-4">
+            <!-- Có tên ảnh -> thử load, lỗi thì fallback sample.png -->
             <img th:if="${book.imageFilename != null and !book.imageFilename.isEmpty()}"
                  th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
+                 onerror="this.onerror=null; this.src='/uploads/sample.png';"
                  class="img-fluid rounded shadow" alt="Ảnh bìa">
-            <div th:unless="${book.imageFilename != null and !book.imageFilename.isEmpty()}"
-                 class="bg-light d-flex align-items-center justify-content-center"
-                 style="height: 300px; border-radius: 0.5rem;">
-                <span class="text-muted">Chưa có ảnh bìa</span>
-            </div>
+            <!-- Không có tên ảnh -> dùng thẳng sample.png -->
+            <img th:unless="${book.imageFilename != null and !book.imageFilename.isEmpty()}"
+                 th:src="@{/uploads/sample.png}"
+                 class="img-fluid rounded shadow" alt="Ảnh bìa">
         </div>
         <div class="col-md-8">
             <h2 th:text="${book.title}">Tên sách</h2>
@@ -36,10 +37,12 @@
             </div>
 
             <div class="d-flex flex-wrap gap-2">
-                <a th:if="${book.quantity > 0}" th:href="@{/borrow(bookId=${book.id})}" class="btn btn-primary">📚 Mượn sách</a>
+                <form th:action="@{/cart/add/{bookId}(bookId=${book.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary" th:if="${book.quantity > 0}">📚 Thêm vào giỏ</button>
+                </form>
                 <a th:if="${canReview}" th:href="@{/review(bookId=${book.id})}" class="btn btn-outline-warning">⭐ Đánh giá</a>
 
-                <span sec:authorize="hasRole('LIBRARIAN')">
+                <span sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')">
                     <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-warning">✏️ Sửa</a>
                     <a th:href="@{/books/{id}/delete(id=${book.id})}" class="btn btn-danger confirm-delete">🗑️ Xóa</a>
                 </span>

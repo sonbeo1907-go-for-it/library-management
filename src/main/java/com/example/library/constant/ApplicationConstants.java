@@ -33,12 +33,24 @@ public final class ApplicationConstants {
     public static final String USER_SAVE_URL = "/users/save";        // POST
     public static final String USER_DELETE_URL = "/users/{id}/delete";
 
+    // Cart
+    public static final String CART_URL = "/cart";
+    public static final String CART_ADD_URL = "/cart/add/{bookId}";
+    public static final String CART_REMOVE_URL = "/cart/remove/{cartItemId}";
+    public static final String CART_SUBMIT_URL = "/cart/submit";
+
+    // Approval
+    public static final String APPROVAL_LIST_URL = "/approvals";
+    public static final String APPROVAL_APPROVE_URL = "/approvals/approve/{cartId}";
+    public static final String APPROVAL_REJECT_URL = "/approvals/reject/{cartId}";
+
     // ===== Upload =====
     public static final String UPLOAD_DIR = "uploads";
     public static final long MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
     // ===== Phân trang =====
     public static final int DEFAULT_PAGE_SIZE = 10;
+    public static final long BORROW_FEE_PER_BOOK = 5000; // VND
 
     // ===== Thời gian mượn mặc định =====
     public static final int BORROW_DURATION_DAYS = 14;
@@ -48,5 +60,10 @@ public final class ApplicationConstants {
     public static final String PROFILE_EDIT_URL = "/profile/edit";
     public static final String CHANGE_PASSWORD_URL = "/profile/change-password";
     // Không cho khởi tạo
+
+    // Admin
+    public static final String ADMIN_REVENUE_URL = "/admin/revenue";
+
+    public static final String MY_CARTS_URL = "/my-carts";
     private ApplicationConstants() {}
 }
