@@ -6,7 +6,6 @@
 <div th:fragment="content">
     <h1 class="mb-4">↩️ Xác nhận trả sách</h1>
 
-    <!-- Thông báo (nếu có lỗi) -->
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <div class="row">
@@ -18,33 +17,38 @@
                 <div class="card-body">
                     <!-- Thông tin sách -->
                     <div class="mb-3">
-                        <p><strong>Tên sách:</strong> <span th:text="${record.book.title}">Tên sách</span></p>
-                        <p><strong>Tác giả:</strong> <span th:text="${record.book.author}">Tác giả</span></p>
+                        <p><strong>Tên sách:</strong> <span th:text="${confirm.bookTitle}"></span></p>
+                        <p><strong>Tác giả:</strong> <span th:text="${confirm.bookAuthor}"></span></p>
                     </div>
 
                     <!-- Thông tin người mượn -->
                     <div class="mb-3">
-                        <p><strong>Người mượn:</strong> <span th:text="${record.user.fullName}">Người mượn</span></p>
+                        <p><strong>Người mượn:</strong> <span th:text="${confirm.borrowerName}"></span></p>
+                    </div>
+
+                    <!-- Mã mượn nếu có -->
+                    <div th:if="${confirm.borrowCode != null}">
+                        <p><strong>Mã mượn:</strong> <code th:text="${confirm.borrowCode}"></code></p>
                     </div>
 
                     <!-- Ngày tháng -->
                     <div class="mb-3">
-                        <p><strong>Ngày mượn:</strong> <span th:text="${#temporals.format(record.borrowDate, 'dd/MM/yyyy')}"></span></p>
-                        <p><strong>Hạn trả:</strong> <span th:text="${#temporals.format(record.dueDate, 'dd/MM/yyyy')}"></span></p>
-                        <p><strong>Ngày trả hôm nay:</strong> <span th:text="${#temporals.format(today, 'dd/MM/yyyy')}">Hôm nay</span></p>
+                        <p><strong>Ngày mượn:</strong> <span th:text="${#temporals.format(confirm.borrowDate, 'dd/MM/yyyy')}"></span></p>
+                        <p><strong>Hạn trả:</strong> <span th:text="${#temporals.format(confirm.dueDate, 'dd/MM/yyyy')}"></span></p>
+                        <p><strong>Ngày trả hôm nay:</strong> <span th:text="${#temporals.format(confirm.today, 'dd/MM/yyyy')}"></span></p>
                     </div>
 
                     <!-- Quá hạn & Phí -->
-                    <div th:if="${daysLate > 0}">
-                        <p class="text-danger"><strong>Số ngày quá hạn:</strong> <span th:text="${daysLate}">0</span> ngày</p>
-                        <p class="text-danger"><strong>Phí phạt:</strong> <span th:text="${formattedFine}">0 VNĐ</span></p>
+                    <div th:if="${confirm.daysLate > 0}">
+                        <p class="text-danger"><strong>Số ngày quá hạn:</strong> <span th:text="${confirm.daysLate}"></span> ngày</p>
+                        <p class="text-danger"><strong>Phí phạt:</strong> <span th:text="${confirm.formattedFine}"></span></p>
                     </div>
-                    <div th:unless="${daysLate > 0}">
+                    <div th:unless="${confirm.daysLate > 0}">
                         <p class="text-success"><strong>Không có phí quá hạn.</strong></p>
                     </div>
 
                     <!-- Form xác nhận trả (POST) -->
-                    <form th:action="@{/return/{id}(id=${record.id})}" method="post">
+                    <form th:action="@{/return/{id}(id=${confirm.recordId})}" method="post">
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success">✅ Xác nhận trả</button>
                             <a th:href="@{/history}" class="btn btn-secondary">Hủy</a>
@@ -56,10 +60,10 @@
 
         <!-- Cột ảnh bìa -->
         <div class="col-md-4">
-            <img th:if="${record.book.imageFilename}"
-                 th:src="@{/uploads/{filename}(filename=${record.book.imageFilename})}"
+            <img th:if="${confirm.imageFilename}"
+                 th:src="@{/uploads/{filename}(filename=${confirm.imageFilename})}"
                  class="img-fluid rounded" alt="Ảnh bìa">
-            <div th:unless="${record.book.imageFilename}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+            <div th:unless="${confirm.imageFilename}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
                 <span class="text-muted">Chưa có ảnh</span>
             </div>
         </div>

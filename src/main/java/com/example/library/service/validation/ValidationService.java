@@ -11,4 +11,5 @@ public interface ValidationService {
     void validateBorrowRecordExists(int recordId);
     void validateNotAlreadyReturned(int recordId);
     void validateCanAddReview(int bookId, int userId);
+    void validateCanReviewOrUpdate(int bookId, int userId);
 }

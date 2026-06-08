@@ -29,24 +29,39 @@
                         <i class="bi bi-collection"></i> Sách
                     </a>
                 </li>
+
+                <li class="nav-item" sec:authorize="hasRole('READER')">
+                    <a class="nav-link" th:href="@{/cart}">
+                        🛒 Giỏ hàng
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('READER')">
+                    <a class="nav-link" th:href="@{/my-carts}">
+                        📑 Yêu cầu mượn sách
+                    </a>
+                </li>
+
                 <!-- Lịch sử mượn (mọi người) -->
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/history}">
+                    <a class="nav-link" th:href="@{/history}" sec:authorize="hasRole('READER')">
                         <i class="bi bi-clock-history"></i> Lịch sử
                     </a>
                 </li>
 
                 <!-- Menu chỉ dành cho Thủ thư (LIBRARIAN) -->
-                <li class="nav-item dropdown" sec:authorize="hasRole('LIBRARIAN')">
-                    <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-tools"></i> Quản lý
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
-                        <li><a class="dropdown-item" th:href="@{/users}">Quản lý người dùng</a></li>
-                        <li><a class="dropdown-item" th:href="@{/overdue}">Sách quá hạn</a></li>
-                    </ul>
-                </li>
+                <li class="nav-item dropdown" sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')">
+                <a class="nav-link dropdown-toggle" href="#" id="librarianDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-tools"></i> Quản lý
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="librarianDropdown">
+                    <li><a class="dropdown-item" th:href="@{/overdue}">Sách quá hạn</a></li>
+                    <li sec:authorize="hasRole('ADMIN')"><hr class="dropdown-divider"></li>
+                    <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/users}">Quản lý người dùng</a></li>
+                    <li sec:authorize="hasRole('ADMIN')"><a class="dropdown-item" th:href="@{/admin/revenue}">Doanh thu</a></li>
+                </ul>
+            </li>
             </ul>
 
             <!-- Menu bên phải: người dùng hiện tại -->

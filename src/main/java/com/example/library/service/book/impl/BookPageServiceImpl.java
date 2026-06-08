@@ -8,6 +8,9 @@ import com.example.library.service.book.BookService;
 import com.example.library.service.review.ReviewService;
 import com.example.library.service.user.CurrentUserService;
 import com.example.library.service.validation.ValidationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,7 +54,7 @@ public class BookPageServiceImpl implements BookPageService {
         boolean canReview = false;
         if (currentUser != null) {
             try {
-                validationService.validateCanAddReview(bookId, currentUser.getId());
+                validationService.validateCanReviewOrUpdate(bookId, currentUser.getId());
                 canReview = true;
             } catch (RuntimeException ignored) {}
         }
@@ -77,5 +80,11 @@ public class BookPageServiceImpl implements BookPageService {
     @Override
     public Book getBookById(int id) {
         return bookService.findById(id);
+    }
+
+    @Override
+    public Page<Book> getBooksForList(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookService.searchBooks(keyword, pageable);
     }
 }

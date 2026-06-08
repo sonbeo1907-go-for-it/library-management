@@ -6,5 +6,6 @@ public interface BookStatisticsService {
     long countBorrowedBooks();       // đang mượn (chưa trả)
     long countOverdueBooks();        // quá hạn chưa trả
     long countTotalUsers();
-    long countActiveBorrowings();    // bản ghi đang mượn
+    long countActiveBorrowings();
+    long countReaders(); // chỉ đếm READER, chưa xóa// bản ghi đang mượn
 }

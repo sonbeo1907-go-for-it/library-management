@@ -19,11 +19,12 @@
                 <th>Hạn trả</th>
                 <th>Số ngày quá hạn</th>
                 <th>Phí phạt</th>
+                <th>Mã mượn</th>   <!-- thêm cột này -->
                 <th>Hành động</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="record : ${records}">
+            <tr th:each="record : ${page.content}">
                 <td>
                     <a th:href="@{/books/{id}(id=${record.bookId})}" th:text="${record.bookTitle}">Tên sách</a>
                 </td>
@@ -38,15 +39,36 @@
                     <span th:unless="${!record.formattedFineAmount.isEmpty()}" class="text-muted">—</span>
                 </td>
                 <td>
+                    <code th:text="${record.borrowCode}">BORW-12345678</code>   <!-- mã mượn -->
+                </td>
+                <td>
                     <a th:href="@{/return/{id}(id=${record.id})}" class="btn btn-sm btn-success">↩️ Trả sách</a>
                 </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(records)}">
-                <td colspan="6" class="text-center text-muted">Không có sách quá hạn nào.</td>
+            <tr th:if="${page.content.isEmpty()}">
+                <td colspan="8" class="text-center text-muted">Không có sách quá hạn nào.</td>   <!-- đổi thành 8 -->
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- PHÂN TRANG giữ nguyên -->
+    <nav aria-label="Page navigation" th:if="${page.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/overdue(page=${page.number - 1}, size=${page.size})}" th:unless="${page.first}">« Trước</a>
+                <span class="page-link" th:if="${page.first}">« Trước</span>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a class="page-link" th:href="@{/overdue(page=${i}, size=${page.size})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/overdue(page=${page.number + 1}, size=${page.size})}" th:unless="${page.last}">Sau »</a>
+                <span class="page-link" th:if="${page.last}">Sau »</span>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

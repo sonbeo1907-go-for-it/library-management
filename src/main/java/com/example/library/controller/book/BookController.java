@@ -4,6 +4,7 @@ import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.ScreenConstants;
 import com.example.library.model.book.Book;
 import com.example.library.service.book.BookPageService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,12 @@ public class BookController {
     }
 
     @GetMapping(ApplicationConstants.BOOK_LIST_URL)
-    public String listBooks(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-        model.addAttribute("books", bookPageService.getBooksForList(keyword));
+    public String listBooks(Model model,
+                            @RequestParam(value = "keyword", required = false) String keyword,
+                            @RequestParam(value = "page", defaultValue = "0") int page,
+                            @RequestParam(value = "size", defaultValue = "12") int size) {
+        Page<Book> bookPage = bookPageService.getBooksForList(keyword, page, size);
+        model.addAttribute("page", bookPage);
         model.addAttribute("keyword", keyword);
         return ScreenConstants.BOOK_LIST;
     }

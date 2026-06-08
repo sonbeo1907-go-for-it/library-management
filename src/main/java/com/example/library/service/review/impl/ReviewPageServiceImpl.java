@@ -28,23 +28,17 @@ public class ReviewPageServiceImpl implements ReviewPageService {
     @Override
     public Book prepareReviewForm(int bookId) {
         Book book = bookService.findById(bookId);
-        if (book == null) {
-            throw new RuntimeException("Không tìm thấy sách.");
-        }
+        if (book == null) throw new RuntimeException("Không tìm thấy sách.");
         User currentUser = currentUserService.getCurrentUser();
-        if (currentUser == null) {
-            throw new RuntimeException("Bạn cần đăng nhập.");
-        }
-        validationService.validateCanAddReview(bookId, currentUser.getId());
+        if (currentUser == null) throw new RuntimeException("Bạn cần đăng nhập.");
+        // Không cần validate can add review ở đây nữa
         return book;
     }
 
     @Override
-    public void addReview(int bookId, int rating, String comment) {
+    public void addOrUpdateReview(int bookId, int rating, String comment) {
         User currentUser = currentUserService.getCurrentUser();
-        if (currentUser == null) {
-            throw new RuntimeException("Bạn cần đăng nhập.");
-        }
-        reviewService.addReview(bookId, currentUser.getId(), rating, comment);
+        if (currentUser == null) throw new RuntimeException("Bạn cần đăng nhập.");
+        reviewService.addOrUpdateReview(bookId, currentUser.getId(), rating, comment);
     }
 }

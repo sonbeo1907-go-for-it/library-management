@@ -5,6 +5,8 @@ import com.example.library.repository.book.BookRepository;
 import com.example.library.service.book.BookService;
 import com.example.library.service.validation.ValidationService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -109,5 +111,20 @@ public class BookServiceImpl implements BookService {
                 System.err.println("Không thể xóa ảnh cũ: " + imageFilename + " - " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Book> searchBooks(String keyword, Pageable pageable) {
+        if (keyword != null && !keyword.isBlank()) {
+            return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(keyword, keyword, pageable);
+        }
+        return bookRepository.findByIsDeletedFalse(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Book> getRandomBooks(int count) {
+        return bookRepository.findRandomBooks(count);
     }
 }

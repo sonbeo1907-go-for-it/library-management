@@ -10,7 +10,11 @@ import com.example.library.service.borrow.BorrowPageService;
 import com.example.library.service.borrow.BorrowService;
 import com.example.library.service.user.CurrentUserService;
 import com.example.library.service.user.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -21,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Service
+@Transactional
 public class BorrowPageServiceImpl implements BorrowPageService {
 
     private final BorrowService borrowService;
@@ -81,7 +86,21 @@ public class BorrowPageServiceImpl implements BorrowPageService {
             NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
             formattedFine = numberFormat.format(fine) + " VNĐ";
         }
-        return new ReturnConfirmDto(record, today, daysLate, fine, formattedFine);
+
+        ReturnConfirmDto dto = new ReturnConfirmDto();
+        dto.setRecordId(record.getId());
+        dto.setBorrowCode(record.getBorrowCode());           // khi thêm borrowCode sẽ có
+        dto.setBookTitle(record.getBook().getTitle());
+        dto.setBookAuthor(record.getBook().getAuthor());
+        dto.setImageFilename(record.getBook().getImageFilename());
+        dto.setBorrowerName(record.getUser().getFullName());
+        dto.setBorrowDate(record.getBorrowDate());
+        dto.setDueDate(record.getDueDate());
+        dto.setToday(today);
+        dto.setDaysLate(daysLate);
+        dto.setFine(fine);
+        dto.setFormattedFine(formattedFine);
+        return dto;
     }
 
     @Override
@@ -90,20 +109,26 @@ public class BorrowPageServiceImpl implements BorrowPageService {
     }
 
     @Override
-    public List<BorrowRecordDto> getHistory() {
+    public Page<BorrowRecordDto> getHistory(int page, int size, String status) {
         User currentUser = currentUserService.getCurrentUser();
         if (currentUser == null) {
             throw new RuntimeException("Bạn cần đăng nhập.");
         }
-        if (currentUserService.hasRole(RoleConstants.LIBRARIAN)) {
-            return borrowService.getAllHistoryDtos();
+        Pageable pageable = PageRequest.of(page, size);
+        if (currentUserService.hasRole(RoleConstants.LIBRARIAN) || currentUserService.hasRole(RoleConstants.ADMIN)) {
+            return borrowService.getAllHistoryDtos(status, pageable);
         } else {
-            return borrowService.getHistoryDtosByUser(currentUser.getId());
+            return borrowService.getHistoryDtosByUser(currentUser.getId(), status, pageable);
         }
     }
-
     @Override
     public List<BorrowRecordDto> getOverdue() {
         return borrowService.getOverdueRecordDtos();
+    }
+
+    @Override
+    public Page<BorrowRecordDto> getOverdue(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return borrowService.getOverdueRecordDtos(pageable);
     }
 }

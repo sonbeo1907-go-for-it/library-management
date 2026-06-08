@@ -23,5 +23,10 @@ public final class ScreenConstants {
     public static final String PROFILE_EDIT = "profile/profile-edit";
     public static final String CHANGE_PASSWORD = "profile/change-password";
 
+    public static final String CART = "cart/cart";
+    public static final String APPROVAL_LIST = "cart/approval-list";
+
+    public static final String MY_CARTS = "cart/my-carts";
+    public static final String REVENUE = "admin/revenue";
     private ScreenConstants() {}
 }

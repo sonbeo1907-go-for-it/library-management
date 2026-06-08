@@ -2,7 +2,9 @@ package com.example.library.controller.auth;
 
 import com.example.library.constant.ApplicationConstants;
 import com.example.library.constant.ScreenConstants;
+import com.example.library.model.user.Role;
 import com.example.library.model.user.User;
+import com.example.library.service.book.BookService;
 import com.example.library.service.home.HomeService;
 import com.example.library.service.user.CurrentUserService;
 import com.example.library.service.user.UserService;
@@ -20,13 +22,15 @@ public class AuthController {
     private final UserService userService;
     private final CurrentUserService currentUserService;
     private final HomeService homeService;
+    private final BookService bookService;
 
     public AuthController(UserService userService,
                           CurrentUserService currentUserService,
-                          HomeService homeService) {
+                          HomeService homeService, BookService bookService) {
         this.userService = userService;
         this.currentUserService = currentUserService;
         this.homeService = homeService;
+        this.bookService = bookService;
     }
 
     @GetMapping(ApplicationConstants.LOGIN_URL)
@@ -63,6 +67,11 @@ public class AuthController {
             return "redirect:" + ApplicationConstants.LOGIN_URL;
         }
         model.addAttribute("homeDto", homeService.getHomeData(currentUser));
+
+        // Gợi ý sách ngẫu nhiên cho độc giả
+        if (currentUser.getRole() == Role.READER) {
+            model.addAttribute("randomBooks", bookService.getRandomBooks(6));
+        }
         return ScreenConstants.HOME;
     }
 }

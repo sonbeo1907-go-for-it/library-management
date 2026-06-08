@@ -1,53 +1,57 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layouts/main :: layout(pageTitle='Đánh giá sách')}">
 <body>
 <div th:fragment="content">
-    <h1 class="mb-4">⭐ Đánh giá sách</h1>
+    <h1 class="mb-4">
+        <span th:if="${existingReview != null}">✏️ Sửa đánh giá</span>
+        <span th:unless="${existingReview != null}">⭐ Đánh giá sách</span>
+    </h1>
 
-    <!-- Thông báo lỗi (nếu có) -->
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <div class="row">
-        <!-- Thông tin sách + ảnh bìa -->
         <div class="col-md-4 text-center">
-            <img th:if="${book.imageFilename}"
+            <!-- Ảnh bìa fallback -->
+            <img th:if="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
                  th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
+                 onerror="this.onerror=null; this.src='/uploads/sample.png';"
                  class="img-fluid rounded mb-3" alt="Ảnh bìa">
-            <div th:unless="${book.imageFilename}" class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 250px;">
-                <span class="text-muted">Chưa có ảnh</span>
-            </div>
+            <img th:unless="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
+                 th:src="@{/uploads/sample.png}"
+                 class="img-fluid rounded mb-3" alt="Ảnh bìa">
             <h5 th:text="${book.title}">Tên sách</h5>
             <p class="text-muted" th:text="${book.author}">Tác giả</p>
         </div>
 
-        <!-- Form đánh giá -->
         <div class="col-md-8">
             <form th:action="@{/review/save}" method="post">
-                <!-- Truyền bookId ẩn -->
                 <input type="hidden" name="bookId" th:value="${book.id}">
 
                 <div class="mb-3">
                     <label for="rating" class="form-label">Số sao</label>
                     <select name="rating" id="rating" class="form-select" required>
                         <option value="">-- Chọn số sao --</option>
-                        <option value="5">⭐⭐⭐⭐⭐ (5 sao)</option>
-                        <option value="4">⭐⭐⭐⭐ (4 sao)</option>
-                        <option value="3">⭐⭐⭐ (3 sao)</option>
-                        <option value="2">⭐⭐ (2 sao)</option>
-                        <option value="1">⭐ (1 sao)</option>
+                        <option value="5" th:selected="${existingReview != null && existingReview.rating == 5}">⭐⭐⭐⭐⭐ (5 sao)</option>
+                        <option value="4" th:selected="${existingReview != null && existingReview.rating == 4}">⭐⭐⭐⭐ (4 sao)</option>
+                        <option value="3" th:selected="${existingReview != null && existingReview.rating == 3}">⭐⭐⭐ (3 sao)</option>
+                        <option value="2" th:selected="${existingReview != null && existingReview.rating == 2}">⭐⭐ (2 sao)</option>
+                        <option value="1" th:selected="${existingReview != null && existingReview.rating == 1}">⭐ (1 sao)</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="comment" class="form-label">Nhận xét</label>
                     <textarea name="comment" id="comment" rows="4" class="form-control"
-                              placeholder="Chia sẻ cảm nhận của bạn về cuốn sách..."></textarea>
+                              th:text="${existingReview != null ? existingReview.comment : ''}"
+                              placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-warning">📩 Gửi đánh giá</button>
+                    <button type="submit" class="btn btn-warning">
+                        <span th:if="${existingReview != null}">Cập nhật</span>
+                        <span th:unless="${existingReview != null}">Gửi đánh giá</span>
+                    </button>
                     <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-secondary">Hủy</a>
                 </div>
             </form>
