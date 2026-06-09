@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/main :: layout(pageTitle='Quản lý lương')}">
+<body>
+<div th:fragment="content">
+    <h1 class="mb-4">💵 Quản lý lương thủ thư</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success auto-hide" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+
+    <form class="row g-3 mb-4" th:action="@{/admin/salaries}" method="get">
+        <div class="col-auto">
+            <label class="col-form-label">Tháng:</label>
+        </div>
+        <div class="col-auto">
+            <select name="month" class="form-select" onchange="this.form.submit()">
+                <option th:each="m : ${#numbers.sequence(1, 12)}"
+                        th:value="${m}" th:text="${m}"
+                        th:selected="${m == month}"></option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="col-form-label">Năm:</label>
+        </div>
+        <div class="col-auto">
+            <input type="number" name="year" class="form-control" th:value="${year}" onchange="this.form.submit()" style="width: 100px;">
+        </div>
+        <div class="col-auto">
+            <label class="col-form-label">Tìm kiếm:</label>
+        </div>
+        <div class="col-auto">
+            <input type="text" name="search" class="form-control" th:value="${search}" placeholder="Tên thủ thư...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">🔍 Tìm</button>
+        </div>
+    </form>
+
+    <form th:action="@{/admin/salaries/calculate}" method="post" class="mb-4">
+        <input type="hidden" name="year" th:value="${year}">
+        <input type="hidden" name="month" th:value="${month}">
+        <button type="submit" class="btn btn-success">🧮 Tính lương tháng <span th:text="${month}"></span>/<span th:text="${year}"></span></button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Thủ thư</th>
+                <th>Lương cứng</th>
+                <th>Hoa hồng</th>
+                <th>Thưởng</th>
+                <th>Tổng</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+                <th>Cấu hình</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="lib : ${librarians}">
+                <td th:text="${lib.fullName}"></td>
+
+                <!-- Trường hợp đã có lương -->
+                <th:block th:if="${lib.hasSalaryRecord && lib.salaryRecord != null}">
+                    <td th:text="${lib.salaryRecord.formattedBaseSalary}"></td>
+                    <td th:text="${lib.salaryRecord.formattedCommissionAmount}"></td>
+                    <td th:text="${lib.salaryRecord.formattedBonusAmount}"></td>
+                    <td th:text="${lib.salaryRecord.formattedTotalSalary}"></td>
+                    <td>
+                        <span th:if="${lib.salaryRecord.status == 'PENDING'}" class="badge bg-warning">Chờ thanh toán</span>
+                        <span th:if="${lib.salaryRecord.status == 'PAID'}" class="badge bg-success">Đã thanh toán</span>
+                        <span th:if="${lib.salaryRecord.status == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1" th:if="${lib.salaryRecord.status == 'PENDING'}">
+                            <form th:action="@{/admin/salaries/{id}/pay(id=${lib.salaryRecord.id})}" method="post">
+                                <input type="hidden" name="year" th:value="${year}">
+                                <input type="hidden" name="month" th:value="${month}">
+                                <button type="submit" class="btn btn-sm btn-success">✅ Thanh toán</button>
+                            </form>
+                            <form th:action="@{/admin/salaries/{id}/cancel(id=${lib.salaryRecord.id})}" method="post">
+                                <input type="hidden" name="year" th:value="${year}">
+                                <input type="hidden" name="month" th:value="${month}">
+                                <button type="submit" class="btn btn-sm btn-danger">❌ Hủy</button>
+                            </form>
+                        </div>
+                    </td>
+                </th:block>
+
+                <!-- Trường hợp chưa có lương -->
+                <th:block th:unless="${lib.hasSalaryRecord && lib.salaryRecord != null}">
+                    <td colspan="4" class="text-muted text-center">Chưa tính lương</td>
+                    <td><span class="badge bg-secondary">Chưa có</span></td>
+                    <td></td>
+                </th:block>
+
+                <!-- Cột cấu hình (luôn hiển thị) -->
+                <td>
+                    <a th:href="@{/admin/salaries/config/{userId}(userId=${lib.userId})}" class="btn btn-sm btn-info">
+                        ⚙️ <span th:text="${lib.hasConfig} ? 'Sửa cấu hình' : 'Cấu hình'"></span>
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(librarians)}">
+                <td colspan="8" class="text-center text-muted">Không có thủ thư nào trong hệ thống.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

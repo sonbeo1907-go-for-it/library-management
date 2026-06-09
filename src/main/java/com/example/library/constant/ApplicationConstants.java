@@ -61,6 +61,13 @@ public final class ApplicationConstants {
     public static final String CHANGE_PASSWORD_URL = "/profile/change-password";
     // Không cho khởi tạo
 
+    // ===== Lương (Admin) =====
+    public static final String ADMIN_SALARIES_URL = "/admin/salaries";
+    public static final String ADMIN_SALARIES_CALCULATE_URL = "/admin/salaries/calculate";
+    public static final String ADMIN_SALARIES_PAY_URL = "/admin/salaries/{id}/pay";
+    public static final String ADMIN_SALARIES_CANCEL_URL = "/admin/salaries/{id}/cancel";
+    public static final String ADMIN_SALARIES_CONFIG_URL = "/admin/salaries/config/{userId}";
+
     // Admin
     public static final String ADMIN_REVENUE_URL = "/admin/revenue";
 

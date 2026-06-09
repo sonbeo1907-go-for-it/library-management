@@ -34,10 +34,15 @@
                 <tbody>
                 <tr th:each="item : ${cart.items}">
                     <td>
-                        <img th:if="${item.imageFilename}"
+                        <!-- Có tên ảnh -> thử load, lỗi thì fallback sample.png -->
+                        <img th:if="${item.imageFilename != null && !item.imageFilename.isEmpty()}"
                              th:src="@{/uploads/{filename}(filename=${item.imageFilename})}"
-                             width="50" class="img-thumbnail">
-                        <span th:unless="${item.imageFilename}" class="text-muted">—</span>
+                             onerror="this.onerror=null; this.src='/uploads/sample.png';"
+                             width="50" class="img-thumbnail" alt="Ảnh bìa">
+                        <!-- Không có tên ảnh -> dùng thẳng sample.png -->
+                        <img th:unless="${item.imageFilename != null && !item.imageFilename.isEmpty()}"
+                             th:src="@{/uploads/sample.png}"
+                             width="50" class="img-thumbnail" alt="Ảnh bìa">
                     </td>
                     <td>
                         <a th:href="@{/books/{id}(id=${item.bookId})}" th:text="${item.bookTitle}">Tên sách</a>

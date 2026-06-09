@@ -51,4 +51,7 @@ public interface BorrowRepository extends JpaRepository<BorrowRecord, Integer> {
             "FROM borrow_record b WHERE b.status = 'RETURNED' AND b.return_date BETWEEN :start AND :end " +
             "GROUP BY DATE(b.return_date)", nativeQuery = true)
     List<Object[]> findFineRevenueByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(br) FROM BorrowRecord br WHERE br.returnedBy.id = :userId AND br.returnDate BETWEEN :start AND :end")
+    long countReturnsByUser(@Param("userId") int userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 }
