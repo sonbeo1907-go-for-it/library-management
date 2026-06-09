@@ -68,6 +68,7 @@ public class CartServiceImpl implements CartService {
         if (book.getQuantity() <= 0) {
             throw new RuntimeException("Sách đã hết.");
         }
+
         boolean alreadyInCart = cart.getItems().stream()
                 .anyMatch(item -> item.getBook().getId() == bookId);
         if (alreadyInCart) {
@@ -77,6 +78,11 @@ public class CartServiceImpl implements CartService {
         User user = cart.getUser();
         validationService.validateNotAlreadyBorrowed(bookId, user.getId());
         validationService.validateUserNotOverdue(user.getId());
+
+        boolean existsInSubmitted = cartRepository.existsByUserIdAndBookIdAndStatusSubmitted(user.getId(), bookId);
+        if (existsInSubmitted) {
+            throw new RuntimeException("Bạn đã có yêu cầu mượn sách này đang chờ duyệt. Vui lòng chờ thủ thư xử lý.");
+        }
 
         CartItem item = new CartItem(cart, book, 1);
         cart.addItem(item);

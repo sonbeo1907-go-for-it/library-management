@@ -1,0 +1,297 @@
+/* ===== Google Font (thêm vào <head> nếu cần, hoặc dùng font hệ thống) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ===== Reset & Base ===== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+a {
+    transition: color 0.2s ease;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    background-color: #2d3748 !important; /* Màu tối hơn, sang hơn */
+}
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.nav-link {
+    font-weight: 500;
+    color: #cbd5e0 !important;
+}
+.nav-link:hover {
+    color: #fff !important;
+}
+
+/* ===== Cards ===== */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+}
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+.btn-primary {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+.btn-primary:hover {
+    background-color: #4338ca;
+    border-color: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+.btn-outline-info {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+.btn-outline-info:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* ===== Tables ===== */
+.table {
+    background: #fff;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.table thead {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+}
+.table th, .table td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+/* ===== Forms ===== */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-control:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
+}
+
+/* ===== Pagination ===== */
+.pagination .page-link {
+    border-radius: 0.5rem;
+    margin: 0 2px;
+    border: none;
+    color: #4f46e5;
+}
+.pagination .page-item.active .page-link {
+    background-color: #4f46e5;
+    color: #fff;
+    border-radius: 0.5rem;
+}
+.pagination .page-link:hover {
+    background-color: #eef2ff;
+}
+
+/* ===== Alerts ===== */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* ===== Footer ===== */
+.footer {
+    background-color: #2d3748 !important;
+    color: #cbd5e0;
+    font-size: 0.9rem;
+}
+
+/* ===== Utilities ===== */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    border-radius: 0.4rem;
+}
+
+/* ===== QR Code Container ===== */
+.qr-container {
+    border-radius: 0;         /* loại bỏ bo góc nếu có */
+    overflow: visible;        /* cho phép QR hiển thị đầy đủ */
+    background: transparent;  /* nền trong suốt */
+    padding: 0;               /* bỏ padding để không tạo viền */
+    box-shadow: none;         /* bỏ đổ bóng */
+    width: auto !important;   /* ghi đè width cố định từ media query */
+    height: auto !important;
+}
+/* ===== Responsive adjustments ===== */
+@media (min-width: 1400px) {
+    body { font-size: 1.05rem; }
+}
+
+/* ===== Hiệu ứng loading mượt mà ===== */
+img {
+    transition: opacity 0.3s ease;
+}
+
+/* ===== Overlay hover cho card sách ===== */
+.hover-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: linear-gradient(transparent 50%, rgba(0,0,0,0.7));
+}
+.card:hover .hover-overlay {
+    opacity: 1;
+}
+
+/* =========================================
+   TỰ ĐỘNG SCALE CHO MÀN HÌNH LỚN
+   ========================================= */
+
+/* --- 2K (2560px) --- */
+@media (min-width: 2000px) {
+    body {
+        font-size: 1.15rem;
+    }
+
+    .container {
+        max-width: 1500px;
+    }
+
+    .row-cols-md-3 {
+        --bs-gutter-y: 1.5rem;
+    }
+
+    /* Card sách dạng grid: hiển thị 4 cột thay vì 3 */
+    .row-cols-md-3 > .col {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+
+    /* Ảnh card cao hơn một chút */
+    .card-img-top {
+        height: 280px !important;
+    }
+
+    /* Bảng có thể rộng hơn */
+    .table-responsive table {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* Nút bấm, badge to hơn nhẹ */
+    .btn {
+        padding: 0.5rem 1.2rem;
+        font-size: 1rem;
+    }
+    .btn-sm {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    /* Modal QR lớn hơn */
+    .modal-dialog-centered {
+        max-width: 700px;
+    }
+    .qr-container {
+        width: 350px !important;
+        height: 350px !important;
+    }
+
+    /* Pagination */
+    .pagination .page-link {
+        padding: 0.5rem 1rem;
+        font-size: 1.05rem;
+    }
+}
+
+/* --- 2.5K (2880px) --- */
+@media (min-width: 2500px) {
+    body {
+        font-size: 1.2rem;
+    }
+
+    .container {
+        max-width: 1600px;
+    }
+
+    /* Card sách: 5 cột */
+    .row-cols-md-3 > .col {
+        width: 20%;
+    }
+
+    /* Dashboard cards */
+    .row-cols-md-3 .card .display-6 {
+        font-size: 2.5rem;
+    }
+
+    .table th, .table td {
+        padding: 0.8rem 1.2rem;
+    }
+}
+
+/* --- 4K (3840px) --- */
+@media (min-width: 3500px) {
+    body {
+        font-size: 1.4rem;
+    }
+
+    .container {
+        max-width: 2000px;
+    }
+
+    /* Card sách: 6 cột */
+    .row-cols-md-3 > .col {
+        width: 16.666%;
+    }
+
+    .card-img-top {
+        height: 350px !important;
+    }
+
+    .btn {
+        padding: 0.6rem 1.4rem;
+        font-size: 1.15rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.8rem;
+    }
+
+    .display-6 {
+        font-size: 3rem;
+    }
+}

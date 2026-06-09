@@ -1,6 +1,7 @@
 package com.example.library.repository.review;
 
 import com.example.library.model.review.Review;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +27,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     long countByBookId(int bookId);
 
     Optional<Review> findByUserIdAndBookId(int userId, int bookId);
+
+    @Query("SELECT b.id, b.title, b.author, b.imageFilename, AVG(r.rating), COUNT(r) " +
+            "FROM Review r JOIN r.book b " +
+            "WHERE b.isDeleted = false " +
+            "GROUP BY b.id, b.title, b.author, b.imageFilename " +
+            "ORDER BY AVG(r.rating) DESC")
+    List<Object[]> findTopBooksByRating(Pageable pageable);
 }
