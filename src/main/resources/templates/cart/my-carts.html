@@ -33,6 +33,7 @@
                 <table class="table table-sm table-bordered">
                     <thead>
                     <tr>
+                        <th>Ảnh bìa</th>
                         <th>Tên sách</th>
                         <th>Tác giả</th>
                         <th>Phí mượn</th>
@@ -40,6 +41,15 @@
                     </thead>
                     <tbody>
                     <tr th:each="item : ${cart.items}">
+                        <td>
+                            <img th:if="${item.imageFilename != null && !item.imageFilename.isEmpty()}"
+                                 th:src="@{/uploads/{filename}(filename=${item.imageFilename})}"
+                                 onerror="this.onerror=null; this.src='/uploads/sample.png';"
+                                 width="40" class="img-thumbnail" alt="Ảnh bìa">
+                            <img th:unless="${item.imageFilename != null && !item.imageFilename.isEmpty()}"
+                                 th:src="@{/uploads/sample.png}"
+                                 width="40" class="img-thumbnail" alt="Ảnh bìa">
+                        </td>
                         <td th:text="${item.bookTitle}">Tên sách</td>
                         <td th:text="${item.bookAuthor}">Tác giả</td>
                         <td th:text="${item.formattedFeePerItem}"></td>
@@ -47,28 +57,66 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt-2">
-                <strong>Tổng phí:</strong> <span th:text="${cart.formattedTotalFee}"></span>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <div>
+                    <strong>Tổng phí:</strong> <span th:text="${cart.formattedTotalFee}"></span>
+                </div>
+                <button th:if="${cart.status.name() == 'SUBMITTED'}" class="btn btn-outline-info btn-sm"
+                        data-bs-toggle="modal" th:data-bs-target="'#qrModal' + ${cart.cartCode}">
+                    📱 Hiện mã QR
+                </button>
+            </div>
+        </div>
+        <!-- Modal QR Code -->
+        <div th:id="'qrModal' + ${cart.cartCode}" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Mã QR giỏ hàng <span th:text="${cart.cartCode}"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <!-- Thay thế div cũ: dùng class qr-container và data-cart-code -->
+                        <div class="qr-container" th:attr="data-cart-code=${cart.cartCode}"
+                             style="width:256px; height:256px; margin:0 auto;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Script tập trung xử lý QR khi modal mở -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.modal').forEach(function(modal) {
+                modal.addEventListener('shown.bs.modal', function() {
+                    var qrDiv = modal.querySelector('.qr-container');
+                    if (qrDiv && !qrDiv.hasChildNodes()) {
+                        var cartCode = qrDiv.getAttribute('data-cart-code');
+                        new QRCode(qrDiv, {
+                            text: cartCode,
+                            width: 256,
+                            height: 256
+                        });
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+
     <!-- PHÂN TRANG -->
     <nav aria-label="Page navigation" th:if="${page.totalPages > 1}" class="mt-4">
         <ul class="pagination justify-content-center">
-            <!-- Nút Previous -->
             <li class="page-item" th:classappend="${page.first} ? 'disabled'">
                 <a class="page-link" th:href="@{/my-carts(page=${page.number - 1}, size=${page.size})}" th:unless="${page.first}">« Trước</a>
                 <span class="page-link" th:if="${page.first}">« Trước</span>
             </li>
-
-            <!-- Các số trang -->
             <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
                 th:classappend="${i == page.number} ? 'active'">
                 <a class="page-link" th:href="@{/my-carts(page=${i}, size=${page.size})}" th:text="${i + 1}">1</a>
             </li>
-
-            <!-- Nút Next -->
             <li class="page-item" th:classappend="${page.last} ? 'disabled'">
                 <a class="page-link" th:href="@{/my-carts(page=${page.number + 1}, size=${page.size})}" th:unless="${page.last}">Sau »</a>
                 <span class="page-link" th:if="${page.last}">Sau »</span>

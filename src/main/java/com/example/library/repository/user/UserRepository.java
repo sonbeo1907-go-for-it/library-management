@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     long countByIsDeletedFalse();
 
     List<User> findByIsDeletedFalse();
+
+    List<User> findByRoleAndIsDeletedFalse(Role role);
 }

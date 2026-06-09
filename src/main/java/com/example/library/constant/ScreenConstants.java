@@ -28,5 +28,8 @@ public final class ScreenConstants {
 
     public static final String MY_CARTS = "cart/my-carts";
     public static final String REVENUE = "admin/revenue";
+
+    public static final String ADMIN_SALARIES = "admin/salaries";
+    public static final String ADMIN_SALARY_CONFIG = "admin/salary-config";
     private ScreenConstants() {}
 }

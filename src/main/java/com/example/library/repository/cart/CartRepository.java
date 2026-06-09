@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,4 +39,10 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
             "FROM cart c WHERE c.status = 'APPROVED' AND c.approved_at BETWEEN :start AND :end " +
             "GROUP BY DATE(c.approved_at)", nativeQuery = true)
     List<Object[]> findRentalRevenueByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(c) FROM Cart c WHERE c.approvedBy.id = :userId AND c.approvedAt BETWEEN :start AND :end")
+    long countApprovalsByUser(@Param("userId") int userId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COALESCE(SUM(c.totalFee), 0) FROM Cart c WHERE c.approvedBy.id = :userId AND c.approvedAt BETWEEN :start AND :end")
+    BigDecimal sumTotalFeeByUser(@Param("userId") int userId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

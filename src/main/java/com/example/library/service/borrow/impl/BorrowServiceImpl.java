@@ -10,6 +10,7 @@ import com.example.library.repository.book.BookRepository;
 import com.example.library.repository.borrow.BorrowRepository;
 import com.example.library.repository.user.UserRepository;
 import com.example.library.service.borrow.BorrowService;
+import com.example.library.service.user.CurrentUserService;
 import com.example.library.service.validation.ValidationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +33,18 @@ public class BorrowServiceImpl implements BorrowService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final ValidationService validationService;
+    private final CurrentUserService currentUserService;
 
     public BorrowServiceImpl(BorrowRepository borrowRepository,
                              BookRepository bookRepository,
                              UserRepository userRepository,
-                             ValidationService validationService) {
+                             ValidationService validationService,
+                             CurrentUserService currentUserService) {
         this.borrowRepository = borrowRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.validationService = validationService;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -80,6 +84,7 @@ public class BorrowServiceImpl implements BorrowService {
             long daysLate = ChronoUnit.DAYS.between(record.getDueDate(), record.getReturnDate());
             BigDecimal fine = BigDecimal.valueOf(daysLate * ApplicationConstants.FINE_PER_DAY);
             record.setFineAmount(fine);
+            record.setReturnedBy(currentUserService.getCurrentUser());
         }
 
         Book book = record.getBook();

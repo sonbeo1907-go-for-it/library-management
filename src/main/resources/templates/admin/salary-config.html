@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/main :: layout(pageTitle='Cấu hình lương')}">
+<body>
+<div th:fragment="content">
+    <h1 class="mb-4">⚙️ Cấu hình lương</h1>
+
+    <div th:if="${errorMessage}" class="alert alert-danger auto-hide" th:text="${errorMessage}"></div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Thủ thư: <span th:text="${config.fullName}"></span></h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/salaries/config/{userId}(userId=${config.userId})}" method="post" th:object="${config}">
+                <input type="hidden" th:field="*{userId}">
+                <div class="mb-3">
+                    <label for="baseSalary" class="form-label">Lương cứng (VNĐ/tháng)</label>
+                    <input type="number" th:field="*{baseSalary}" id="baseSalary" class="form-control" required min="0" step="1000">
+                </div>
+                <div class="mb-3">
+                    <label for="commissionRate" class="form-label">Tỷ lệ hoa hồng (0.05 = 5%)</label>
+                    <input type="number" th:field="*{commissionRate}" id="commissionRate" class="form-control" step="0.001" min="0" max="1">
+                </div>
+                <div class="mb-3">
+                    <label for="bonusPerApproval" class="form-label">Thưởng mỗi lượt duyệt (VNĐ)</label>
+                    <input type="number" th:field="*{bonusPerApproval}" id="bonusPerApproval" class="form-control" required min="0" step="1000">
+                </div>
+                <div class="mb-3">
+                    <label for="bonusPerReturn" class="form-label">Thưởng mỗi lượt xác nhận trả (VNĐ)</label>
+                    <input type="number" th:field="*{bonusPerReturn}" id="bonusPerReturn" class="form-control" required min="0" step="1000">
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Lưu</button>
+                <a th:href="@{/admin/salaries}" class="btn btn-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
