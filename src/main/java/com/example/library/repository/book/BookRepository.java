@@ -25,6 +25,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     Page<Book> findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(String title, String author, Pageable pageable);
 
-    @Query(value = "SELECT * FROM book WHERE is_deleted = false ORDER BY RAND() LIMIT ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM book WHERE is_deleted = false ORDER BY RANDOM() LIMIT ?1", nativeQuery = true)
     List<Book> findRandomBooks(int count);
 }
