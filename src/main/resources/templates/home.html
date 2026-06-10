@@ -16,24 +16,82 @@
     <!-- Dashboard cho Thủ thư -->
     <div sec:authorize="hasAnyRole('LIBRARIAN','ADMIN')">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Các card thống kê... (giữ nguyên) -->
+            <div class="col">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">📚 Tổng số sách</h5>
+                        <p class="card-text display-6" th:text="${homeDto.totalBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">✅ Sách có sẵn</h5>
+                        <p class="card-text display-6" th:text="${homeDto.availableBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">📖 Đang mượn</h5>
+                        <p class="card-text display-6" th:text="${homeDto.borrowedBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">⏰ Quá hạn</h5>
+                        <p class="card-text display-6" th:text="${homeDto.overdueBooks}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">👥 Độc giả</h5>
+                        <p class="card-text display-6" th:text="${homeDto.totalUsers}">0</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <hr class="my-4">
         <h4>⚡ Hành động nhanh</h4>
         <div class="d-flex flex-wrap gap-2">
-            <!-- Các nút hành động... (giữ nguyên) -->
+            <a th:href="@{/books}" class="btn btn-outline-primary btn-lg">📚 Quản lý sách</a>
+            <a th:href="@{/approvals}" class="btn btn-outline-secondary btn-lg">📝 Duyệt mượn sách</a>
+            <a th:href="@{/overdue}" class="btn btn-outline-danger btn-lg">⚠️ Sách quá hạn</a>
+            <a th:href="@{/history}" class="btn btn-outline-dark btn-lg">📋 Lịch sử mượn/trả</a>
         </div>
     </div>
 
     <!-- Dashboard cho Độc giả -->
     <div sec:authorize="!hasAnyRole('LIBRARIAN','ADMIN')">
         <div class="row row-cols-1 row-cols-md-2 g-4">
-            <!-- Các card thống kê... (giữ nguyên) -->
+            <div class="col">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">📗 Sách đang mượn</h5>
+                        <p class="card-text display-6" th:text="${homeDto.currentlyBorrowed}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">⏳ Sách quá hạn</h5>
+                        <p class="card-text display-6" th:text="${homeDto.overdue}">0</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <hr class="my-4">
         <h4>🔍 Khám phá</h4>
         <div class="d-flex flex-wrap gap-2">
-            <!-- Các nút... (giữ nguyên) -->
+            <a th:href="@{/books}" class="btn btn-primary btn-lg">📚 Xem tất cả sách</a>
+            <a th:href="@{/history}" class="btn btn-outline-dark btn-lg">📋 Lịch sử mượn của tôi</a>
         </div>
     </div>
 
@@ -98,6 +156,5 @@
     </div>
 
 </div>
-<!-- Nhớ xóa thẻ <style> thừa nếu có -->
 </body>
 </html>
