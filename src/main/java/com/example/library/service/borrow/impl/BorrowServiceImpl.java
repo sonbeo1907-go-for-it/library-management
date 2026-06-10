@@ -79,12 +79,12 @@ public class BorrowServiceImpl implements BorrowService {
         BorrowRecord record = borrowRepository.findById(recordId).orElseThrow();
         record.setStatus(BorrowStatus.RETURNED);
         record.setReturnDate(LocalDate.now());
+        record.setReturnedBy(currentUserService.getCurrentUser());
 
         if (record.getReturnDate().isAfter(record.getDueDate())) {
             long daysLate = ChronoUnit.DAYS.between(record.getDueDate(), record.getReturnDate());
             BigDecimal fine = BigDecimal.valueOf(daysLate * ApplicationConstants.FINE_PER_DAY);
             record.setFineAmount(fine);
-            record.setReturnedBy(currentUserService.getCurrentUser());
         }
 
         Book book = record.getBook();
