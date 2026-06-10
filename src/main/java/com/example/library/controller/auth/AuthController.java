@@ -66,6 +66,7 @@ public class AuthController {
         if (currentUser == null) {
             return "redirect:" + ApplicationConstants.LOGIN_URL;
         }
+        model.addAttribute("topBooks", bookService.getTopRatedBooks(5));
         model.addAttribute("homeDto", homeService.getHomeData(currentUser));
 
         // Gợi ý sách ngẫu nhiên cho độc giả

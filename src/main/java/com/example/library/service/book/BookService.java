@@ -1,6 +1,7 @@
 package com.example.library.service.book;
 
 import com.example.library.model.book.Book;
+import com.example.library.model.book.BookWithRatingDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,4 +26,6 @@ public interface BookService {
     Page<Book> searchBooks(String keyword, Pageable pageable);
 
     List<Book> getRandomBooks(int count);
+
+    List<BookWithRatingDto> getTopRatedBooks(int limit);
 }

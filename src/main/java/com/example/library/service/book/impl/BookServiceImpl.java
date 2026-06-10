@@ -1,11 +1,14 @@
 package com.example.library.service.book.impl;
 
 import com.example.library.model.book.Book;
+import com.example.library.model.book.BookWithRatingDto;
 import com.example.library.repository.book.BookRepository;
+import com.example.library.repository.review.ReviewRepository;
 import com.example.library.service.book.BookService;
 import com.example.library.service.validation.ValidationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,9 +27,10 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final ValidationService validationService;
     private final Path uploadPath;
+    private final ReviewRepository reviewRepository;
 
     public BookServiceImpl(BookRepository bookRepository,ValidationService validationService ,
-                           @Value("${app.upload.dir}") String uploadDir) {
+                           @Value("${app.upload.dir}") String uploadDir, ReviewRepository reviewRepository) {
         this.bookRepository = bookRepository;
         this.validationService = validationService;
         this.uploadPath = Paths.get(uploadDir);
@@ -34,6 +39,7 @@ public class BookServiceImpl implements BookService {
         } catch (IOException e) {
             throw new RuntimeException("Không thể tạo thư mục uploads: " + uploadPath, e);
         }
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -126,5 +132,22 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public List<Book> getRandomBooks(int count) {
         return bookRepository.findRandomBooks(count);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookWithRatingDto> getTopRatedBooks(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Object[]> rows = reviewRepository.findTopBooksByRating(pageable);
+        return rows.stream().map(row -> {
+            BookWithRatingDto dto = new BookWithRatingDto();
+            dto.setId((int) row[0]);
+            dto.setTitle((String) row[1]);
+            dto.setAuthor((String) row[2]);
+            dto.setImageFilename((String) row[3]);
+            dto.setAverageRating(((Number) row[4]).doubleValue());
+            dto.setReviewCount(((Number) row[5]).intValue());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

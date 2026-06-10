@@ -10,6 +10,7 @@ RUN mvn package -DskipTests -Dfile.encoding=UTF-8
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+# Tạo thư mục uploads
 RUN mkdir uploads
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

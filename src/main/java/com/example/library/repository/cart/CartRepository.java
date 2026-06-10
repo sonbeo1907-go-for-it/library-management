@@ -45,4 +45,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     @Query("SELECT COALESCE(SUM(c.totalFee), 0) FROM Cart c WHERE c.approvedBy.id = :userId AND c.approvedAt BETWEEN :start AND :end")
     BigDecimal sumTotalFeeByUser(@Param("userId") int userId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(c) > 0 FROM Cart c JOIN c.items i WHERE c.user.id = :userId AND i.book.id = :bookId AND c.status = 'SUBMITTED'")
+    boolean existsByUserIdAndBookIdAndStatusSubmitted(@Param("userId") int userId, @Param("bookId") int bookId);
 }

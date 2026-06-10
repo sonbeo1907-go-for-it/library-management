@@ -94,31 +94,76 @@
             <a th:href="@{/history}" class="btn btn-outline-dark btn-lg">📋 Lịch sử mượn của tôi</a>
         </div>
     </div>
+
     <!-- Sách gợi ý ngẫu nhiên -->
     <div th:if="${randomBooks != null && !randomBooks.isEmpty()}">
         <hr class="my-4">
         <h4>📚 Có thể bạn sẽ thích</h4>
         <div class="d-flex flex-nowrap overflow-auto pb-3">
             <div class="flex-shrink-0 me-3" th:each="book : ${randomBooks}" style="width: 200px;">
-                <div class="card h-100 shadow-sm">
-                    <!-- Có tên ảnh -> thử load, lỗi thì fallback sample.png -->
+                <a th:href="@{/books/{id}(id=${book.id})}"
+                   class="card h-100 shadow-sm text-decoration-none text-dark position-relative overflow-hidden"
+                   style="display: block;">
+                    <!-- Ảnh bìa -->
                     <img th:if="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
                          th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
                          onerror="this.onerror=null; this.src='/uploads/sample.png';"
-                         class="card-img-top" alt="Ảnh bìa" style="height: 150px; object-fit: cover;">
-                    <!-- Không có tên ảnh -> dùng thẳng sample.png -->
+                         class="card-img-top" alt="Ảnh bìa" style="height: 200px; object-fit: cover;">
                     <img th:unless="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
                          th:src="@{/uploads/sample.png}"
-                         class="card-img-top" alt="Ảnh bìa" style="height: 150px; object-fit: cover;">
-                    <div class="card-body p-2">
-                        <h6 class="card-title small" th:text="${book.title}">Tên sách</h6>
-                        <p class="card-text text-muted small mb-1" th:text="${book.author}">Tác giả</p>
-                        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-outline-primary w-100">Chi tiết</a>
+                         class="card-img-top" alt="Ảnh bìa" style="height: 200px; object-fit: cover;">
+
+                    <!-- Overlay hiển thị khi hover -->
+                    <div class="card-img-overlay d-flex flex-column justify-content-end align-items-center hover-overlay">
+                        <h6 class="card-title text-white small mb-1" th:text="${book.title}">Tên sách</h6>
+                        <p class="card-text text-white-50 small mb-1" th:text="${book.author}">Tác giả</p>
+                        <span class="btn btn-sm btn-outline-light w-100">Xem chi tiết</span>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
+
+    <!-- Sách được yêu thích -->
+    <div th:if="${topBooks != null && !topBooks.isEmpty()}" sec:authorize="!hasAnyRole('LIBRARIAN','ADMIN')">
+        <hr class="my-4">
+        <h4>⭐ Sách được yêu thích</h4>
+        <div class="d-flex flex-nowrap overflow-auto pb-3">
+            <div class="flex-shrink-0 me-3" th:each="book : ${topBooks}" style="width: 200px;">
+                <a th:href="@{/books/{id}(id=${book.id})}"
+                   class="card h-100 shadow-sm text-decoration-none text-dark position-relative overflow-hidden"
+                   style="display: block;">
+                    <!-- Ảnh bìa -->
+                    <img th:if="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
+                         th:src="@{/uploads/{filename}(filename=${book.imageFilename})}"
+                         onerror="this.onerror=null; this.src='/uploads/sample.png';"
+                         class="card-img-top" alt="Ảnh bìa" style="height: 200px; object-fit: cover;">
+                    <img th:unless="${book.imageFilename != null && !book.imageFilename.isEmpty()}"
+                         th:src="@{/uploads/sample.png}"
+                         class="card-img-top" alt="Ảnh bìa" style="height: 200px; object-fit: cover;">
+
+                    <!-- Overlay hiển thị khi hover -->
+                    <div class="card-img-overlay d-flex flex-column justify-content-end align-items-center hover-overlay">
+                        <h6 class="card-title text-white small mb-1" th:text="${book.title}">Tên sách</h6>
+                        <p class="card-text text-white-50 small mb-1" th:text="${book.author}">Tác giả</p>
+                        <div class="text-warning small mb-1">
+                            ⭐ <span th:text="${#numbers.formatDecimal(book.averageRating, 1, 1)}">0.0</span>
+                            (<span th:text="${book.reviewCount}">0</span>)
+                        </div>
+                        <span class="btn btn-sm btn-outline-light w-100">Xem chi tiết</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<!-- CSS cho hiệu ứng hover overlay -->
+<style>
+    .card:hover .card-img-overlay {
+        opacity: 1 !important;
+    }
+</style>
 </body>
 </html>
